@@ -7,15 +7,16 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <x-auth-session-status class="mb-4" :status="session('status')" />
             @if (session('status'))
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="flex items-center gap-4">
+                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="flex items-center gap-4">
                     @if (session('status') === 'user-created')
                     <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm text-gray-600">Created successfully</p>
                     @endif
                     @if (session('status') === 'profile-updated')
-                    <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm text-gray-600">Updated successfully</p>
+                    <div class="max-w-xl">
+                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm text-gray-600">Updated successfully</p>
+
                     @endif
                 </div>
             </div>
@@ -25,11 +26,11 @@
             </div>
 
             @if(Route::currentRouteName() == 'users')
-                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                    <div class="max-w-xl">
-                        @include('users.partials.create')
-                    </div>
+            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                <div class="max-w-xl">
+                    @include('users.partials.create')
                 </div>
+            </div>
             @else
 
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
