@@ -20,7 +20,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register']]);
+        $this->middleware('auth:api', ['except' => ['login','register','forgotPassword','confirmOtp','passwordReset']]);
     }
 
     /**
@@ -54,7 +54,11 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first(), $validator->errors());
         }
-
+        $checkNumber = $this->sanitizePhoneNumber($input['phone']);
+        if ($checkNumber['text'] == 'Invalid') {
+            return $this->sendError(__('ApiMessage.invalidPhone'), '', 422);
+        }
+        $input['phone'] = $checkNumber['phoneNumber'];
         $user = User::create($input);
 
         $role = Role::where(['name' => 'Admin'])->first();
@@ -114,7 +118,7 @@ class AuthController extends Controller
         if ($input['otp'] != '12345') {
             return $this->sendError(__('ApiMessage.invalidOtp'));
         }
-        return $this->sendResponseStatus(__('ApiMessage.confirmOtp'));
+        return $this->sendSuccess(__('ApiMessage.confirmOtp'));
     }
 
     public function passwordReset(Request $request): JsonResponse
@@ -135,13 +139,12 @@ class AuthController extends Controller
             return $this->sendError(__('ApiMessage.invalidPhone'), '', 422);
         }
         $input['phone'] = $checkNumber['phoneNumber'];
-        $user = User::where('phone', $input['phone'])->exists();
-
+        $user = User::where('phone', $input['phone'])->first();
         if (!$user) {
-            return $this->sendError('Unauthorised', ['error' => 'Not valid.']);
+            return $this->sendError('Unauthorised', ['error' => 'Phone not registered']);
         }
         $user->update(['password' => Hash::make($input['password'])]);
-        return $this->sendResponseStatus(__('ApiMessage.passwordReset'));
+        return $this->sendSuccess(__('ApiMessage.passwordReset'));
     }
 
     public static function sanitizePhoneNumber($fetchPhoneNumber){
