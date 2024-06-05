@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,5 +28,9 @@ Route::group([
     $router->post('register', [AuthController::class, 'register']);
     $router->post('logout', [AuthController::class, 'logout']);
     $router->post('refresh', [AuthController::class, 'refresh']);
+    $router->post('forgot-password', [AuthController::class, 'forgotPassword']);
+    $router->post('confirm-otp', [AuthController::class, 'confirmOtp']);
+    $router->post('reset-password', [AuthController::class, 'passwordReset']);
     $router->post('me', [AuthController::class, 'me']);
+    $router->apiResource('users', UserController::class);
 });
