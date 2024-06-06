@@ -24,8 +24,6 @@ class ResetPasswordNotification extends Notification
     {
         $this->message='use the below code for reset password';
         $this->subject='password resetting';
-        $this->fromEmail='info@paypye.com';
-        $this->mailer='sendmail';
         $this->otp=new Otp();
     }
 
@@ -46,7 +44,6 @@ class ResetPasswordNotification extends Notification
     {
         $otp=$this->otp->generate($notifiable->email, 'numeric', 6, 15);
         return (new MailMessage)
-            ->mailer('smtp')
             ->subject($this->subject)
             ->line($this->message)
             ->line("code :".$otp->token);
