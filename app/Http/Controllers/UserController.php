@@ -49,6 +49,8 @@ class UserController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
+            'dob' => $request->dob,
             'password' => Hash::make($request->password),
         ]);
 
@@ -62,13 +64,14 @@ class UserController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
+        // dd($request->all());
         $user = User::find($id);
         $user->fill($request->all());
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
-
+        // dd($user);
         $user->save();
 
         return Redirect::route('users')->with('status', 'profile-updated');

@@ -11,6 +11,8 @@
                         <th class="py-3 px-6 text-center">ID</th>
                         <th class="py-3 px-6 text-center">Name</th>
                         <th class="py-3 px-6 text-center">Email</th>
+                        <th class="py-3 px-6 text-center">Phone</th>
+                        <th class="py-3 px-6 text-center">DOB</th>
                         <th class="py-3 px-6 text-center">Actions</th>
             </tr>
         </thead>
@@ -26,6 +28,12 @@
                 </td>
                 <td class="px-6 py-4 text-center">
                 {{ $user->email }}
+                </td>
+                <td class="px-6 py-4 text-center">
+                {{ $user->phone }}
+                </td>
+                <td class="px-6 py-4 text-center">
+                {{ $user->dob }}
                 </td>
                 <td class="px-6 py-4 text-center">
                     <a href="/users/{{ $user->id }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
