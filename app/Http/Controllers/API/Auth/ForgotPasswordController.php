@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\api\auth;
+namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Http\Request;
