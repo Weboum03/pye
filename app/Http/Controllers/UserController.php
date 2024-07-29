@@ -22,19 +22,16 @@ class UserController extends Controller
     public function edit(Request $request): View
     {
         $users = User::latest()->get();
-        return view('users.content', [
-            'user' => $request->user(),
+        return view('users.index', [
             'users' => $users
         ]);
     }
 
     public function show($id, Request $request): View
     {
-        $users = User::latest()->get();
         $user = User::find($id);
-        return view('users.content', [
-            'user' => $user,
-            'users' => $users
+        return view('users.update', [
+            'user' => $user
         ]);
     }
 

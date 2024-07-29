@@ -43,6 +43,8 @@ class Authenticate
             }
             return response('Unauthorized.', 401);
         }
+        
+        auth()->setDefaultDriver($guard);
 
         return $next($request);
     }

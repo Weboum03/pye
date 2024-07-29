@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'admin',
+        'guard' => 'merchant',
         'passwords' => 'users',
     ],
 
@@ -48,6 +48,10 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
+        'merchant' => [
+            'driver' => 'session',
+            'provider' => 'merchants',
+        ],
     ],
 
     /*
@@ -75,6 +79,10 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
+        ],
+        'merchants' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Merchant::class,
         ],
 
         // 'users' => [
@@ -111,6 +119,12 @@ return [
         ],
         'admins' => [
             'provider' => 'admins',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'merchants' => [
+            'provider' => 'merchants',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,

@@ -22,7 +22,7 @@ class AdminController extends Controller
     public function edit(Request $request): View
     {
         $users = Admin::latest()->get();
-        return view('admins.content', [
+        return view('users.content', [
             'user' => $request->user(),
             'users' => $users
         ]);
@@ -32,7 +32,7 @@ class AdminController extends Controller
     {
         $users = Admin::latest()->get();
         $user = Admin::find($id);
-        return view('admins.content', [
+        return view('users.content', [
             'user' => $user,
             'users' => $users
         ]);
@@ -54,7 +54,7 @@ class AdminController extends Controller
 
         event(new Registered($user));
         return back()->with('status', 'user-created');
-        return redirect('admins');
+        return redirect('users');
     }
 
     /**
@@ -71,7 +71,7 @@ class AdminController extends Controller
 
         $user->save();
 
-        return Redirect::route('admins')->with('status', 'profile-updated');
+        return Redirect::route('users')->with('status', 'profile-updated');
     }
 
     /**
