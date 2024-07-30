@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ApiKeyController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +60,7 @@ Route::middleware('auth:merchant')->group(function () {
 
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('profile/key', [ProfileController::class, 'updateKey'])->name('profile.update.key');
     Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::post('users', [UserController::class, 'store'])->name('users.store');
@@ -78,11 +81,22 @@ Route::middleware('auth:merchant')->group(function () {
     Route::patch('merchants/{id}', [MerchantController::class, 'update'])->name('merchants.update');
     Route::delete('merchants/{id}', [MerchantController::class, 'destroy'])->name('merchants.destroy');
 
-    Route::post('transactions', [AdminController::class, 'store'])->name('transactions.store');
-    Route::get('transactions', [AdminController::class, 'edit'])->name('transactions');
-    Route::get('transactions/{id}', [AdminController::class, 'show'])->name('transactions.show');
-    Route::patch('transactions/{id}', [AdminController::class, 'update'])->name('transactions.update');
-    Route::delete('transactions/{id}', [AdminController::class, 'destroy'])->name('transactions.destroy');
+    Route::post('transactions', [TransactionController::class, 'store'])->name('transactions.store');
+    Route::get('transactions', [TransactionController::class, 'edit'])->name('transactions');
+    Route::get('transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::patch('transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
+    Route::delete('transactions/{id}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+
+
+    Route::get('api-keys', [ApiKeyController::class, 'index'])->name('keys');;
+    Route::post('api-keys', [ApiKeyController::class, 'generate'])->name('key.generate');
+    Route::delete('api-keys/{id}', [ApiKeyController::class, 'revoke'])->name('key.revoke');
+
+    Route::middleware('api.key')->group(function () {
+        Route::get('/protected-route', function () {
+            return response()->json(['message' => 'This is a protected route']);
+        });
+    });
 });
 
 
