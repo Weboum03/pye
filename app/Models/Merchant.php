@@ -15,7 +15,7 @@ class Merchant extends Authenticatable implements JWTSubject
     use HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password','phone','dob'
     ];
 
     protected $hidden = [

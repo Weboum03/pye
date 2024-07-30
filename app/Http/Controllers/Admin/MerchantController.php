@@ -71,7 +71,7 @@ class MerchantController extends Controller
 
         $user->save();
 
-        return Redirect::route('merchants')->with('status', 'profile-updated');
+        return Redirect::route('admin.merchants')->with('status', 'profile-updated');
     }
 
     /**

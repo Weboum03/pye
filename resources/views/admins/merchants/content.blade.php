@@ -22,20 +22,20 @@
             </div>
             @endif
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                @include('users.table')
+                @include('admins.merchants.table')
             </div>
 
             @if(Route::currentRouteName() == 'users')
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-xl">
-                    @include('users.partials.create')
+                    @include('admins.merchants.partials.create')
                 </div>
             </div>
             @else
 
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-xl">
-                    @include('users.partials.update')
+                    @include('admins.merchants.partials.update')
                 </div>
             </div>
 

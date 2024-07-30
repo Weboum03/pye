@@ -36,7 +36,7 @@
                 {{ $user->dob }}
                 </td>
                 <td class="px-6 py-4 text-center">
-                    <a href="/users/{{ $user->id }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                    <a href="/admin/merchants/{{ $user->id }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
                 </td>
             </tr>
             @endforeach

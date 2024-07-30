@@ -15,7 +15,7 @@
             >Created successfully</p>
         @endif
     </div>
-    <form method="post" action="{{ route('users.update', ['id' => $user->id]) }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('admin.users.update', ['id' => $user->id]) }}" class="mt-6 space-y-6">
         @csrf
         @method('patch')
 

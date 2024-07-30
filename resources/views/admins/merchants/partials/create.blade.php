@@ -4,7 +4,7 @@
             Create New
         </h2>
     </header>
-    <form method="POST" action="{{ route('users') }}" class="mt-6 space-y-6">
+    <form method="POST" action="{{ route('admin.merchants') }}" class="mt-6 space-y-6">
         @csrf
 
         <!-- Name -->
