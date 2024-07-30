@@ -4,6 +4,7 @@ use App\Http\Controllers\API\Auth\ForgotPasswordController;
 use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\ShiftController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,4 +39,15 @@ Route::group([
     $router->post('reset-password', [AuthController::class, 'passwordReset']);
     $router->post('me', [AuthController::class, 'me']);
     $router->apiResource('users', UserController::class);
+});
+
+Route::group([
+    'middleware' => 'api'
+], function ($router) {
+    $router->get('gateway/access_token', [ShiftController::class, 'accessToken']);
+    $router->get('gateway/invoice', [ShiftController::class, 'invoice']);
+    $router->get('gateway/refund', [ShiftController::class, 'refund']);
+    $router->get('gateway/sale', [ShiftController::class, 'sale']);
+    $router->get('gateway/tokenAdd', [ShiftController::class, 'tokenAdd']);
+    $router->get('gateway/void', [ShiftController::class, 'void']);
 });
