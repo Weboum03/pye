@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Admin\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\Auth\VerifyEmailController;
 use App\Http\Controllers\Admin\MerchantController;
+use App\Http\Controllers\Admin\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,6 +72,12 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('merchants/{id}', [MerchantController::class, 'show'])->name('admin.merchants.show');
     Route::patch('merchants/{id}', [MerchantController::class, 'update'])->name('admin.merchants.update');
     Route::delete('merchants/{id}', [MerchantController::class, 'destroy'])->name('admin.merchants.destroy');
+
+    Route::post('transactions', [TransactionController::class, 'store'])->name('admin.transactions.store');
+    Route::get('transactions', [TransactionController::class, 'edit'])->name('admin.transactions');
+    Route::get('transactions/{id}', [TransactionController::class, 'show'])->name('admin.transactions.show');
+    Route::patch('transactions/{id}', [TransactionController::class, 'update'])->name('admin.transactions.update');
+    Route::delete('transactions/{id}', [TransactionController::class, 'destroy'])->name('admin.transactions.destroy');
 
     Route::post('admins', [AdminController::class, 'store'])->name('admin.admins.store');
     Route::get('admins', [AdminController::class, 'edit'])->name('admin.admins');
