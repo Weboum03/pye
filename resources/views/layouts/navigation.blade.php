@@ -17,17 +17,17 @@
                     </x-nav-link>
                 </div>
 
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('users')" :active="request()->routeIs('users')">
+                <!--div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                   // <x-nav-link :href="route('users')" :active="request()->routeIs('users')">
                         Users
                     </x-nav-link>
-                </div>
+                </div-->
 
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('transactions')" :active="request()->routeIs('orders')">
+                <!--div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex ">
+                    //<x-nav-link :href="route('transactions')" :active="request()->routeIs('orders')">
                         Orders
                     </x-nav-link>
-                </div>
+                </div-->
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('transactions')" :active="request()->routeIs('transactions')">
@@ -55,6 +55,10 @@
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
+                        </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('ip_whitelists')">
+                            {{ __('IP Whitelists') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -101,6 +105,10 @@
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('ip_whitelists')">
+                    {{ __('IP Whitelists') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->

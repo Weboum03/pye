@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\IpWhitelistController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\TransactionController;
 
@@ -87,6 +88,11 @@ Route::middleware('auth:merchant')->group(function () {
     Route::patch('transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
     Route::delete('transactions/{id}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
 
+    Route::post('ip_whitelists', [IpWhitelistController::class, 'store'])->name('ip_whitelists.store');
+    Route::get('ip_whitelists', [IpWhitelistController::class, 'edit'])->name('ip_whitelists');
+    Route::get('ip_whitelists/{id}', [IpWhitelistController::class, 'show'])->name('ip_whitelists.show');
+    Route::patch('ip_whitelists/{id}', [IpWhitelistController::class, 'update'])->name('ip_whitelists.update');
+    Route::delete('ip_whitelists/{id}', [IpWhitelistController::class, 'destroy'])->name('ip_whitelists.destroy');
 
     Route::get('api-keys', [ApiKeyController::class, 'index'])->name('keys');;
     Route::post('api-keys', [ApiKeyController::class, 'generate'])->name('key.generate');

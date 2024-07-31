@@ -31,6 +31,11 @@ class Merchant extends Authenticatable implements JWTSubject
         return $this->hasMany(ApiKey::class, 'merchant_id', 'id');
     }
 
+    public function ipWhitelists()
+    {
+        return $this->hasMany(IpWhitelist::class);
+    }
+
         /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
