@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\IpWhitelistController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\TransactionController;
@@ -93,6 +94,12 @@ Route::middleware('auth:merchant')->group(function () {
     Route::get('ip_whitelists/{id}', [IpWhitelistController::class, 'show'])->name('ip_whitelists.show');
     Route::patch('ip_whitelists/{id}', [IpWhitelistController::class, 'update'])->name('ip_whitelists.update');
     Route::delete('ip_whitelists/{id}', [IpWhitelistController::class, 'destroy'])->name('ip_whitelists.destroy');
+
+    Route::post('companies', [CompanyController::class, 'store'])->name('companies.store');
+    Route::get('companies', [CompanyController::class, 'edit'])->name('companies');
+    Route::get('companies/{id}', [CompanyController::class, 'show'])->name('companies.show');
+    Route::patch('companies/{id}', [CompanyController::class, 'update'])->name('companies.update');
+    Route::delete('companies/{id}', [CompanyController::class, 'destroy'])->name('companies.destroy');
 
     Route::get('api-keys', [ApiKeyController::class, 'index'])->name('keys');;
     Route::post('api-keys', [ApiKeyController::class, 'generate'])->name('key.generate');
