@@ -18,13 +18,20 @@
         @method('post')
 
         <div>
-            <x-input-label for="name" :value="__('Name')" />
+            <x-input-label for="name" :value="__('API Key')" />
             <x-text-input id="name" readonly name="name" type="text" class="mt-1 block w-full bg-grey" :value="old('name', $user->apiKeys()->latest()->first()?->key)" required autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Generate') }}</x-primary-button>
+            @if($user->apiKeys()->latest()->first())
+            <x-primary-button x-data=""
+            x-on:click.prevent="$dispatch('open-modal', 'confirm-key-reset')"
+        >{{ __('Generate') }}</x-primary-button>
+            @else
+            <x-primary-button >{{ __('Generate') }}</x-primary-button>
+            @endif
+            
 
             @if (session('status') === 'key-updated')
                 <p
@@ -35,6 +42,29 @@
                     class="text-sm text-gray-600"
                 >{{ __('Saved.') }}</p>
             @endif
+
+            
         </div>
     </form>
+
+    <x-modal name="confirm-key-reset" :show="$errors->userDeletion->isNotEmpty()" focusable>
+        <form method="post" action="{{ route('key.generate') }}" class="p-6">
+            @csrf
+            @method('post')
+
+            <h2 class="text-lg font-medium text-gray-900">
+                {{ __('Are you sure you want to reset your API Key?') }}
+            </h2>
+
+            <div class="mt-6 flex justify-end">
+                <x-secondary-button x-on:click="$dispatch('close')">
+                    {{ __('Cancel') }}
+                </x-secondary-button>
+
+                <x-danger-button class="ms-3">
+                    {{ __('Confirm') }}
+                </x-danger-button>
+            </div>
+        </form>
+    </x-modal>
 </section>
