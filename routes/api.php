@@ -42,12 +42,12 @@ Route::group([
 });
 
 Route::group([
-    'middleware' => 'api'
+    'middleware' => 'auth:api'
 ], function ($router) {
     $router->get('gateway/access_token', [ShiftController::class, 'accessToken']);
-    $router->get('gateway/invoice', [ShiftController::class, 'invoice']);
-    $router->get('gateway/refund', [ShiftController::class, 'refund']);
-    $router->get('gateway/sale', [ShiftController::class, 'sale']);
-    $router->get('gateway/tokenAdd', [ShiftController::class, 'tokenAdd']);
+    $router->get('gateway/invoice/{invoiceId}', [ShiftController::class, 'invoice']);
+    $router->post('gateway/refund', [ShiftController::class, 'refund']);
+    $router->post('gateway/sale', [ShiftController::class, 'sale']);
+    $router->post('gateway/tokenAdd', [ShiftController::class, 'tokenAdd']);
     $router->get('gateway/void', [ShiftController::class, 'void']);
 });

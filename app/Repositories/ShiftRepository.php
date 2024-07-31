@@ -526,9 +526,9 @@ class ShiftRepository
         ])->post('https://api.shift4test.com/api/rest/v1/credentials/accesstoken', $data);
     }
 
-    public function invoice() {
+    public function invoice($invoiceId) {
         return Http::withHeaders([
-            'Invoice' => '0000192029',
+            'Invoice' => $invoiceId,
             'InterfaceVersion' => '2.1',
             'InterfaceName' => 'ForwardPOS',
             'CompanyName' => 'PAWS',
