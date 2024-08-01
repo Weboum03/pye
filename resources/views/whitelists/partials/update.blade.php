@@ -31,6 +31,13 @@
             <x-input-error class="mt-2" :messages="$errors->get('phone')" />
         </div>
 
+        <div>
+            @php $options = ['active', 'inactive']; @endphp
+            <x-input-label for="status" value="Status" />
+            <x-select-input :options='$options' id="status" name="status" type="text" class="mt-1 block w-full" :value="old('status', $user->status)" required autocomplete="status" />
+            <x-input-error class="mt-2" :messages="$errors->get('status')" />
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 

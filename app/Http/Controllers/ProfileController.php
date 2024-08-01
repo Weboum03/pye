@@ -37,6 +37,20 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
+        /**
+     * Update the user's profile information.
+     */
+    public function updateCompany(Request $request): RedirectResponse
+    {
+        $company = $request->user()->company()->firstOrNew();
+
+        $company->fill($request->all());
+
+        $company->save();
+
+        return Redirect::route('profile.edit')->with('status', 'company-updated');
+    }
+
     /**
      * Delete the user's account.
      */

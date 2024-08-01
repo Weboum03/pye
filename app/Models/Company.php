@@ -9,7 +9,7 @@ class Company extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['merchant_id', 'name', 'email', 'phone', 'address'];
+    protected $fillable = ['merchant_id', 'name', 'email', 'phone', 'address','state', 'city', 'zipcode', 'website'];
 
     public function merchant()
     {
