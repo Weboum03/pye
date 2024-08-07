@@ -17,6 +17,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\IpWhitelistController;
 use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TransactionController;
 
 /*
@@ -84,11 +85,13 @@ Route::middleware('auth:merchant')->group(function () {
     Route::patch('merchants/{id}', [MerchantController::class, 'update'])->name('merchants.update');
     Route::delete('merchants/{id}', [MerchantController::class, 'destroy'])->name('merchants.destroy');
 
-    Route::post('transactions', [TransactionController::class, 'store'])->name('transactions.store');
     Route::get('transactions', [TransactionController::class, 'edit'])->name('transactions');
     Route::get('transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
     Route::patch('transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
-    Route::delete('transactions/{id}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+
+    Route::get('orders', [OrderController::class, 'edit'])->name('orders');
+    Route::get('orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::patch('orders/{id}', [OrderController::class, 'update'])->name('orders.update');
 
     Route::post('ip_whitelists', [IpWhitelistController::class, 'store'])->name('ip_whitelists.store');
     Route::get('ip_whitelists', [IpWhitelistController::class, 'edit'])->name('ip_whitelists');

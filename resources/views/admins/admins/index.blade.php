@@ -22,17 +22,9 @@
             </div>
             @endif
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                @include('admins.transactions.table')
+                @include('users.table')
             </div>
-
-            @if(Route::currentRouteName() != 'transactions')
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('users.partials.update')
-                </div>
-            </div>
-            @endif
         </div>
 
     </div>
-</x-app-layout-admin>
+</x-app-layout>

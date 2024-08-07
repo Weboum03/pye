@@ -18,25 +18,25 @@
         </thead>
         <tbody>
 
-            @foreach($users as $user)
+            @foreach($admins as $admin)
             <tr class="bg-white border-b dark:border-gray-700">
                 <th scope="row" class="px-6 py-4 text-center">
-                {{ $user->id }}
+                {{ $admin->id }}
                 </th>
                 <td class="px-6 py-4 text-center">
-                {{ $user->name }}
+                {{ $admin->name }}
                 </td>
                 <td class="px-6 py-4 text-center">
-                {{ $user->email }}
+                {{ $admin->email }}
                 </td>
                 <td class="px-6 py-4 text-center">
-                {{ $user->phone }}
+                {{ $admin->phone }}
                 </td>
                 <td class="px-6 py-4 text-center">
-                {{ $user->dob }}
+                {{ $admin->dob }}
                 </td>
                 <td class="px-6 py-4 text-center">
-                    <a href="/admin/users/{{ $user->id }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                    <a href="/admin/admins/{{ $admin->id }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
                 </td>
             </tr>
             @endforeach

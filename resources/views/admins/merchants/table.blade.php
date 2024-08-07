@@ -1,11 +1,11 @@
 <header>
         <h2 class="text-lg font-medium text-gray-900">
-            Users List
+            Merchant List
         </h2>
     </header>
 
-<div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-6 space-y-6">
-    <table class="w-full text-sm text-left rtl:text-right">
+<div class="relative overflow-x-auto sm:rounded-lg mt-6 space-y-6">
+    <table class="w-full text-sm text-left rtl:text-right" id="myTable">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
         <tr>
                         <th class="py-3 px-6 text-center">ID</th>
@@ -43,3 +43,27 @@
         </tbody>
     </table>
 </div>
+
+@section('styles')
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+
+<style>
+    .dataTables_wrapper .dataTables_length select {
+        padding-right: 2.5rem
+    }
+</style>
+@endsection
+
+@section('scripts')
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#myTable').DataTable();
+    });
+</script>
+@endsection

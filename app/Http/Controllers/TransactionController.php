@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Admin;
 use App\Models\Merchant;
+use App\Models\Transaction;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -22,39 +23,18 @@ class TransactionController extends Controller
      */
     public function edit(Request $request): View
     {
-        $users = [];
+        $transactions = Auth::user()->transactions;
         return view('transactions.index', [
-            'user' => $request->user(),
-            'users' => $users
+            'transactions' => $transactions
         ]);
     }
 
     public function show($id, Request $request): View
     {
-        $users = Merchant::latest()->get();
-        $user = Merchant::find($id);
+        $transaction = Auth::user()->transactions()->where('id', $id)->first();
         return view('transactions.update', [
-            'user' => $user,
-            'users' => $users
+            'transaction' => $transaction
         ]);
-    }
-
-    public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Merchant::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-
-        $user = Merchant::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        event(new Registered($user));
-        return back()->with('status', 'user-created');
     }
 
     /**
@@ -62,36 +42,22 @@ class TransactionController extends Controller
      */
     public function update($id, Request $request): RedirectResponse
     {
-        $user = Merchant::find($id);
-        $user->fill($request->all());
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
-        $user->save();
+        $transaction = Transaction::find($id);
+        $transaction->fill($request->all());
+        $transaction->save();
 
         return Redirect::route('transactions')->with('status', 'profile-updated');
     }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
+    public function refund(Request $request, $id)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
+        $transaction = Transaction::findOrFail($id);
+        
+        // Initiate refund logic here (e.g., using Stripe, PayPal, etc.)
+        // For demonstration, we'll assume the refund is successful and update the transaction record.
 
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        $transaction->update(['status' => 'refunded']);
+        
+        return redirect()->route('orders.show', $transaction->order_id)->with('success', 'Refund successful!');
     }
 }

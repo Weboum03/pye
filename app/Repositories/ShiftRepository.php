@@ -28,284 +28,7 @@ class ShiftRepository
         return CallRate::class;
     }
 
-    public function getDidRequest($id) {
-        return DidNumberRequest::find($id);
-    }
-
-    public function getDidwwDidId($didNumber) {
-        $didNumber = str_replace('+','',$didNumber);
-        $url = 'dids?filter[number]=' . $didNumber.'&include=did_group.city';
-        return $this->callDidwwGetRequest($url);
-    }
-
-    public function getCountryByIso($iso) {
-        $url = 'countries?filter[iso]='.$iso;
-        return $this->callDidwwGetRequest($url);
-    }
-
-    public function create($data) {
-        $postData = [
-            'data' => [
-                'type' => 'identities',
-                'attributes' => [
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'],
-                    'phone_number' => $data['phone_number'],
-                    'identity_type' => $data['identity_type'],
-                ]
-            ]
-        ];
-
-        if($data['identity_type'] == 'Business') {
-            $postData['data']['attributes']['company_name'] = $data['company_name'];
-            $postData['data']['attributes']['company_reg_number'] = $data['company_reg_number'];
-            $postData['data']['attributes']['description'] = $data['description'];
-            $postData['data']['attributes']['vat_id'] = $data['vat_id'];
-            $postData['data']['attributes']['personal_tax_id'] = $data['personal_tax_id'];
-            //$postData['data']['attributes']['id_number'] = '11111111-1111-1111-1111-111111111111';
-            //$postData['data']['attributes']['birth_date'] = $data['birth_date'];
-            //$postData['data']['attributes']['external_reference_id'] = $data['external_reference_id'];
-
-            $postData['data']['relationships'] = [
-                'country' => [
-                    'data' => [
-                        'id' => $data['country_id'],
-                        'type' => 'countries'
-                    ]
-                ]
-            ];
-        }
-
-        return $this->callDidwwPostRequest('identities', $postData);
-    }
-
-    public function update($id, $data) {
-        $postData = [
-            'data' => [
-                'id' => $id,
-                'type' => 'identities',
-                'attributes' => [
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'],
-                    'phone_number' => $data['phone_number'],
-                ]
-            ]
-        ];
-
-        if($data['identity_type'] == 'Business') {
-            $postData['data']['attributes']['company_name'] = $data['company_name'];
-            $postData['data']['attributes']['company_reg_number'] = $data['company_reg_number'];
-            $postData['data']['attributes']['description'] = $data['description'];
-            $postData['data']['attributes']['vat_id'] = $data['vat_id'];
-            $postData['data']['attributes']['personal_tax_id'] = $data['personal_tax_id'];
-        }
-        return $this->callDidwwPatchRequest('identities/' . $id.'?include=addresses', $postData);
-    }
-
-    public function addressCreate($data) {
-        $postData = [
-            'data' => [
-                'type' => 'addresses',
-                'attributes' => [
-                    'city_name' => $data['city_name'],
-                    'postal_code' => $data['postal_code'],
-                    'address' => $data['address'],
-                    'description' => $data['description'],
-                ],
-                'relationships' => [
-                    'identity' => [
-                        'data' => [
-                            'id' => $data['identity_id'],
-                            'type' => 'identities'
-                        ]
-                    ],
-                    'country' => [
-                        'data' => [
-                            'id' => $data['country_id'],
-                            'type' => 'countries'
-                        ]
-                    ],
-                ]
-            ]
-        ];
-
-        return $this->callDidwwPostRequest('addresses', $postData);
-    }
-
-    public function addressUpdate($id, $data) {
-        $postData = [
-            'data' => [
-                'id' => $id,
-                'type' => 'addresses',
-                'attributes' => [
-                    'city_name' => $data['city_name'],
-                    'postal_code' => $data['postal_code'],
-                    'address' => $data['address'],
-                    'description' => $data['description'],
-                ],
-                'relationships' => [
-                    'country' => [
-                        'data' => [
-                            'id' => $data['country_id'],
-                            'type' => 'countries'
-                        ]
-                    ],
-                ]
-            ]
-        ];
-
-        return $this->callDidwwPatchRequest('addresses/'.$id, $postData);
-    }
-
-    public function addressVerification($data) {
-        $postData = [
-            'data' => [
-                'type' => 'address_verifications',
-                'attributes' => [
-                    'callback_url' => url('admin/kyc/callback'),
-                    'callback_method' => 'POST',
-                ],
-                'relationships' => [
-                    'dids' => [
-                        'data' => [
-                            [
-                                'id' => $data['did_id'],
-                                'type' => 'dids'
-                            ]
-                           
-                        ]
-                    ],
-                    'address' => [
-                        'data' => [
-                            'id' => $data['address_id'],
-                            'type' => 'addresses'
-                        ]
-                    ],
-                ]
-            ]
-        ];
-
-        return $this->callDidwwPostRequest('address_verifications', $postData);
-    }
-
-    public function createProofs($data) {
-        $files = $data['files'];
-        $postData = [
-            'data' => [
-                'type' => 'proofs',
-                'relationships' => [
-                    'proof_type' => [
-                        'data' => [
-                            'id' => $data['proof_type_id'],
-                            'type' => 'proof_types'
-                        ]
-                    ],
-                    'entity' => [
-                        'data' => [
-                            'id' => $data['identity_id'],
-                            'type' => 'identities'
-                        ]
-                    ],
-                ]
-            ]
-        ];
-
-        if($files) {
-            foreach($files as $file) {
-                $postData['data']['relationships']['files']['data'][] = ['id' => $file, 'type' => 'encrypted_files'];
-            }
-        }
-
-        return $this->callDidwwPostRequest('proofs', $postData);
-    }
-
-    public function createAddressProofs($data) {
-        $files = $data['files'];
-        $postData = [
-            'data' => [
-                'type' => 'proofs',
-                'relationships' => [
-                    'proof_type' => [
-                        'data' => [
-                            'id' => $data['proof_type_id'],
-                            'type' => 'proof_types'
-                        ]
-                    ],
-                    'entity' => [
-                        'data' => [
-                            'id' => $data['address_id'],
-                            'type' => 'addresses'
-                        ]
-                    ],
-                ]
-            ]
-        ];
-
-        if($files) {
-            foreach($files as $file) {
-                $postData['data']['relationships']['files']['data'][] = ['id' => $file, 'type' => 'encrypted_files'];
-            }
-        }
-
-        return $this->callDidwwPostRequest('proofs', $postData);
-    }
-
-    public function createRequirementValidations($data) {
-        $postData = [
-            'data' => [
-                'type' => 'requirement_validations',
-                'relationships' => [
-                    'requirement' => [
-                        'data' => [
-                            'id' => $data['requirement_id'],
-                            'type' => 'requirements'
-                        ]
-                    ],
-                    'address' => [
-                        'data' => [
-                            'id' => $data['address_id'],
-                            'type' => 'addresses'
-                        ]
-                    ],
-                    'identity' => [
-                        'data' => [
-                            'id' => $data['identity_id'],
-                            'type' => 'identities'
-                        ]
-                    ],
-                ]
-            ]
-        ];
-
-        return $this->callDidwwPostRequest('requirement_validations', $postData);
-    }
-
-    public function listing($request) {
-        return $this->callDidwwGetRequest('identities');
-    }
-
-    public function getProofTypes($entityType = 'Personal') {
-        return $this->callDidwwGetRequest('proof_types?filter[entity_type]='.$entityType);
-    }
-
-    public function getRequirements($countryId) {
-        return $this->callDidwwGetRequest('requirements?filter[country.id]=' . $countryId);
-    }
-
-    public function getKycVerification($verificationId) {
-        return $this->callDidwwGetRequest('address_verifications/'.$verificationId.'?include=address,dids');
-    }
-
-    public function getSupportingDocumenTemplates() {
-        return $this->callDidwwGetRequest('supporting_document_templates');
-    }
-
-    public function delete($identityId) {
-
-        return $this->callDidwwDeleteRequest('identities/'.$identityId);
-    }
-
-    public function createSale() {
+    public function createSale($payload) {
 
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
@@ -321,12 +44,12 @@ class ShiftRepository
             ],
             "card" => [
                 "entryMode" => "M",
-                "expirationDate" => 1230,
-                "number" => "4321000000001119",
+                "expirationDate" => $payload['exp_month'].$payload['exp_year'],
+                "number" => $payload['number'],
                 "present" => "N",
                 "securityCode" => [
                     "indicator" => "1",
-                    "value" => "333"
+                    "value" => $payload['cvc'],
                 ],
                 "type" => "VS"
             ],
@@ -334,10 +57,10 @@ class ShiftRepository
                 "numericId" => 1576
             ],
             "customer" => [
-                "addressLine1" => "65 Easy St",
-                "firstName" => "John",
-                "lastName" => "Smith",
-                "postalCode" => "65144"
+                "addressLine1" => $payload['address'],
+                "firstName" => $payload['first_name'],
+                "lastName" => $payload['last_name'],
+                "postalCode" => $payload['postal_code'],
             ],
             "transaction" => [
                 "hotel" => [
@@ -411,7 +134,7 @@ class ShiftRepository
         ])->post('https://api.shift4test.com/api/rest/v1/transactions/sale', $data);
     }
 
-    public function refund() {
+    public function refund($payload) {
 
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
@@ -422,8 +145,8 @@ class ShiftRepository
             ],
             "card" => [
                 "entryMode" => "M",
-                "expirationDate" => 1230,
-                "number" => "4321000000001119",
+                "expirationDate" => $payload->exp_month.$payload->exp_year,
+                "number" => $payload->card_number,
                 "present" => "N",
                 "type" => "VS"
             ],
@@ -431,10 +154,10 @@ class ShiftRepository
                 "numericId" => 1576
             ],
             "customer" => [
-                "addressLine1" => "65 Easy St",
-                "firstName" => "John",
-                "lastName" => "Smith",
-                "postalCode" => "65144"
+                "addressLine1" => $payload->address,
+                "firstName" => $payload->first_name,
+                "lastName" => $payload->last_name,
+                "postalCode" => $payload->postal_code,
             ],
             "transaction" => [
                 "invoice" => "192029",

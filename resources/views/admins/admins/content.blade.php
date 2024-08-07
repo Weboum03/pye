@@ -1,7 +1,7 @@
-<x-app-layout>
+<x-app-layout-admin>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
+            {{ __('Admin') }}
         </h2>
     </x-slot>
 
@@ -22,10 +22,24 @@
             </div>
             @endif
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                @include('admins.admins.table')
+            </div>
+
+            @if(Route::currentRouteName() == 'admin.admins')
+            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-xl">
-                    @include('users.partials.create')
+                    @include('admins.admins.partials.create')
                 </div>
             </div>
+            @else
+
+            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                <div class="max-w-xl">
+                    @include('admins.users.partials.update')
+                </div>
+            </div>
+
+            @endif
         </div>
 
     </div>

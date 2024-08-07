@@ -1,42 +1,38 @@
 <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            Users List
-        </h2>
-    </header>
+    <h2 class="text-lg font-medium text-gray-900">
+        {{__('Orders')}}
+    </h2>
+</header>
 
 <div class="relative overflow-x-auto sm:rounded-lg mt-6 space-y-6">
     <table class="w-full text-sm text-left rtl:text-right" id="myTable">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-        <tr>
-                        <th class="py-3 px-6 text-center">ID</th>
-                        <th class="py-3 px-6 text-center">Name</th>
-                        <th class="py-3 px-6 text-center">Email</th>
-                        <th class="py-3 px-6 text-center">Phone</th>
-                        <th class="py-3 px-6 text-center">DOB</th>
-                        <th class="py-3 px-6 text-center">Actions</th>
+            <tr>
+                <th class="py-3 px-6 text-center">ID</th>
+                <th class="py-3 px-6 text-center">Order ID</th>
+                <th class="py-3 px-6 text-center">Amount</th>
+                <th class="py-3 px-6 text-center">Status</th>
+                <th class="py-3 px-6 text-center">Actions</th>
             </tr>
         </thead>
         <tbody>
 
-            @foreach($users as $user)
+            @foreach($orders as $order)
             <tr class="bg-white border-b dark:border-gray-700">
                 <th scope="row" class="px-6 py-4 text-center">
-                {{ $user->id }}
+                    {{ $order->id }}
                 </th>
                 <td class="px-6 py-4 text-center">
-                {{ $user->name }}
+                    {{ $order->order_id }}
                 </td>
                 <td class="px-6 py-4 text-center">
-                {{ $user->email }}
+                    {{ $order->total_amount }}
                 </td>
                 <td class="px-6 py-4 text-center">
-                {{ $user->phone }}
+                    {{ $order->status }}
                 </td>
                 <td class="px-6 py-4 text-center">
-                {{ $user->dob }}
-                </td>
-                <td class="px-6 py-4 text-center">
-                    <a href="/admin/users/{{ $user->id }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                    <!-- <a href="/orders/{{ $order->id }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a> -->
                 </td>
             </tr>
             @endforeach

@@ -21,20 +21,17 @@ class AdminController extends Controller
      */
     public function edit(Request $request): View
     {
-        $users = Admin::latest()->get();
-        return view('admins.users.content', [
-            'user' => $request->user(),
-            'users' => $users
+        $admins = Admin::latest()->get();
+        return view('admins.admins.content', [
+            'admins' => $admins
         ]);
     }
 
     public function show($id, Request $request): View
     {
-        $users = Admin::latest()->get();
-        $user = Admin::find($id);
-        return view('admins.users.content', [
-            'user' => $user,
-            'users' => $users
+        $admin = Admin::find($id);
+        return view('admins.admins.content', [
+            'admin' => $admin
         ]);
     }
 

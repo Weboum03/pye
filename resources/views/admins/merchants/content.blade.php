@@ -25,7 +25,7 @@
                 @include('admins.merchants.table')
             </div>
 
-            @if(Route::currentRouteName() == 'users')
+            @if(Route::currentRouteName() == 'admin.merchants')
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-xl">
                     @include('admins.merchants.partials.create')

@@ -4,7 +4,9 @@ use App\Http\Controllers\API\Auth\ForgotPasswordController;
 use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\API\OrderController;
+use App\Http\Controllers\API\ShiftController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +27,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('password/forgot',[ForgotPasswordController::class,'forgotPassword']);
 Route::post('password/reset',[ResetPasswordController::class,'resetPassword']);
+Route::post('generate-token', [UserController::class, 'generateToken']);
+Route::get('fetch-verification-session', [UserController::class, 'fetchVerificationSession']);
 
 Route::group([
     'middleware' => 'api',
@@ -46,8 +50,20 @@ Route::group([
 ], function ($router) {
     $router->get('gateway/access_token', [ShiftController::class, 'accessToken']);
     $router->get('gateway/invoice/{invoiceId}', [ShiftController::class, 'invoice']);
+    $router->get('gateway/invoice', [ShiftController::class, 'invoice']);
     $router->post('gateway/refund', [ShiftController::class, 'refund']);
     $router->post('gateway/sale', [ShiftController::class, 'sale']);
     $router->post('gateway/tokenAdd', [ShiftController::class, 'tokenAdd']);
     $router->get('gateway/void', [ShiftController::class, 'void']);
+});
+
+Route::middleware('api.key')->group(function ($router) {
+    Route::get('/protected-route', function () {
+        return response()->json(['message' => 'This is a protected route']);
+    });
+
+    $router->get('orders/{id}', [OrderController::class, 'show']);
+    $router->post('orders', [OrderController::class, 'create']);
+    $router->post('orders/{id}/process-payment', [OrderController::class, 'processPayment']);
+    $router->post('orders/{id}/refund', [OrderController::class, 'refund']);
 });
