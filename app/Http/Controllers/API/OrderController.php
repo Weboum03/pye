@@ -81,6 +81,7 @@ class OrderController extends Controller
         }
 
         $order->update(['status' => 'completed']);
+        $order->transaction_id = $transaction->transaction_id;
 
         return $this->sendResponse($order, __('ApiMessage.success'));
     }
@@ -141,7 +142,7 @@ class OrderController extends Controller
 
     public function refund($transactionId, Request $request)
     {
-        $transaction = Transaction::find($transactionId);
+        $transaction = Transaction::where('transaction_id',$transactionId)->first();
 
         if(!$transaction) {
             return $this->sendError('Transaction not found');
@@ -153,6 +154,14 @@ class OrderController extends Controller
         if ($response->failed()) {
             return $this->sendError($response->collect('result')->first()['error']['longText']);
         }
+
+        Transaction::create([
+            'transaction_id' => Str::uuid(),
+            'order_id' => $order->id,
+            'amount' => $order->total_amount,
+            'type' => 'refund',
+            'status' => 'completed'
+        ]);
 
         $transaction->status = 'refund';
         $transaction->save();
