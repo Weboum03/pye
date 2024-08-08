@@ -27,6 +27,8 @@ class OrderController extends Controller
     {
         $input = $request->all();
         $rules = [
+            'order_id'    => 'required|unique:orders',
+            'tax'    => 'required',
             'amount'    => 'required',
             'number'    => 'required',
             'exp_month'    => 'required',
@@ -50,7 +52,7 @@ class OrderController extends Controller
         }
 
         $order = Order::create([
-            'order_id' => Str::uuid(),
+            'order_id' => $input['order_id'],
             'merchant_id' => $merchantId,
             'user_id' => 1,
             'total_amount' => $input['amount'],
@@ -88,7 +90,11 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::findOrFail($id);
+        $order = Order::where('order_id',$id)->first();
+
+        if(!$order) {
+            return $this->sendError('Order not exist');
+        }
         return $this->sendResponse($order, __('ApiMessage.success'));
     }
 
@@ -155,6 +161,10 @@ class OrderController extends Controller
             return $this->sendError($response->collect('result')->first()['error']['longText']);
         }
 
+        if($transaction->status == 'refund') {
+            return $this->sendError('Already refunded.');
+        }
+
         Transaction::create([
             'transaction_id' => Str::uuid(),
             'order_id' => $order->id,
@@ -165,7 +175,10 @@ class OrderController extends Controller
 
         $transaction->status = 'refund';
         $transaction->save();
+
+        $order->status = 'refund';
+        $order->save();
         
-        return $this->sendResponse($response->json('result'), __('success'));
+        return $this->sendResponse($transaction, __('success'));
     }
 }

@@ -34,10 +34,10 @@ class ShiftRepository
         $data = [
             "dateTime" => $currentDateTime,
             "amount" => [
-                "cashback" => 20,
-                "tax" => 15,
-                "tip" => 20,
-                "total" => 160
+                "cashback" => 0,
+                "tax" => $payload['tax'],
+                "tip" => 0,
+                "total" => $payload['amount'],
             ],
             "apiOptions" => [
                 "ALLOWPARTIALAUTH"
@@ -140,8 +140,8 @@ class ShiftRepository
         $data = [
             "dateTime" => $currentDateTime,
             "amount" => [
-                "tax" => 10.05,
-                "total" => 121.83
+                "tax" => 0,
+                "total" => (int)$payload['amount'],
             ],
             "card" => [
                 "entryMode" => "M",
