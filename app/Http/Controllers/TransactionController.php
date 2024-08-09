@@ -7,12 +7,14 @@ use App\Models\Admin;
 use App\Models\Merchant;
 use App\Models\Transaction;
 use App\Providers\RouteServiceProvider;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -56,8 +58,15 @@ class TransactionController extends Controller
         // Initiate refund logic here (e.g., using Stripe, PayPal, etc.)
         // For demonstration, we'll assume the refund is successful and update the transaction record.
 
+        $newTrans = $transaction->replicate();
+        $newTrans->transaction_id = Str::uuid();
+        $newTrans->type = 'refund';
+        $newTrans->created_at = Carbon::now();
+        $newTrans->updated_at = Carbon::now();
+        $newTrans->save();
+
         $transaction->update(['status' => 'refunded']);
         
-        return redirect()->route('orders.show', $transaction->order_id)->with('success', 'Refund successful!');
+        return redirect()->route('transactions', $transaction->order_id)->with('success', 'Refund successful!');
     }
 }
