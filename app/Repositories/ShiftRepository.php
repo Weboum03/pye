@@ -34,10 +34,26 @@ class ShiftRepository
         $data = [
             "dateTime" => $currentDateTime,
             "amount" => [
-                "cashback" => 0,
                 "tax" => $payload['tax'],
-                "tip" => 0,
                 "total" => $payload['amount'],
+            ],
+            "clerk" => [
+                "numericId" => 1576
+            ],
+            "transaction" => [
+                "invoice" => $payload['id'],
+                "notes" => "Transaction notes are added here",
+                "purchaseCard" => [
+                    "customerReference" => "D019D09309F2",
+                    "source" => "2",
+                    "destinationPostalCode" => "94719",
+                    "productDescriptors" => [
+                        "Hamburger",
+                        "Fries",
+                        "Soda",
+                        "Cookie"
+                    ]
+                ]
             ],
             "apiOptions" => [
                 "ALLOWPARTIALAUTH"
@@ -53,76 +69,14 @@ class ShiftRepository
                 ],
                 "type" => "VS"
             ],
-            "clerk" => [
-                "numericId" => 1576
-            ],
+            
             "customer" => [
                 "addressLine1" => $payload['address'],
                 "firstName" => $payload['first_name'],
                 "lastName" => $payload['last_name'],
                 "postalCode" => $payload['postal_code'],
             ],
-            "transaction" => [
-                "hotel" => [
-                    "additionalCharges" => [
-                        "giftShop" => "Y",
-                        "laundry" => "Y",
-                        "miniBar" => "Y",
-                        "other" => "Y",
-                        "restaurant" => "Y",
-                        "telephone" => "Y"
-                    ],
-                    "arrivalDateTime" => "2021-04-12T15:39:01.594-07:00",
-                    "departureDateTime" => "2021-04-15T09:18:23.283-07:00",
-                    "primaryChargeType" => 1,
-                    "roomRates" => [
-                        [
-                            "nights" => 2,
-                            "rate" => 159.95
-                        ],
-                        [
-                            "nights" => 3,
-                            "rate" => 125.38
-                        ]
-                    ],
-                    "specialCode" => 1
-                ],
-                "invoice" => "192029",
-                "notes" => "Transaction notes are added here",
-                "purchaseCard" => [
-                    "customerReference" => "D019D09309F2",
-                    "source" => "2",
-                    "destinationPostalCode" => "94719",
-                    "productDescriptors" => [
-                        "Hamburger",
-                        "Fries",
-                        "Soda",
-                        "Cookie"
-                    ]
-                ]
-            ],
-            "reportingData" => [
-                "customerInfo" => [
-                    [
-                        "firstName" => "Jane",
-                        "lastName" => "Smith",
-                        "dateOfBirth" => "12011983",
-                        "gender" => "female",
-                        "baggage" => "checked",
-                        "seats" => "1A",
-                        "boardingPriority" => "1"
-                    ],
-                    [
-                        "firstName" => "John",
-                        "lastName" => "Smith",
-                        "dateOfBirth" => "01281980",
-                        "gender" => "male",
-                        "baggage" => "carryon",
-                        "seats" => "1B",
-                        "boardingPriority" => "1"
-                    ]
-                ]
-            ]
+            
         ];
         
         return Http::withHeaders([
@@ -141,7 +95,7 @@ class ShiftRepository
             "dateTime" => $currentDateTime,
             "amount" => [
                 "tax" => 0,
-                "total" => (int)$payload['amount'],
+                "total" => (int)$payload->amount,
             ],
             "card" => [
                 "entryMode" => "M",
@@ -162,28 +116,6 @@ class ShiftRepository
             "transaction" => [
                 "invoice" => "192029",
                 "notes" => "Transaction notes are added here"
-            ],
-            "reportingData" => [
-                "customerInfo" => [
-                    [
-                        "firstName" => "Jane",
-                        "lastName" => "Smith",
-                        "dateOfBirth" => "12011983",
-                        "gender" => "female",
-                        "baggage" => "checked",
-                        "seats" => "1A",
-                        "boardingPriority" => "1"
-                    ],
-                    [
-                        "firstName" => "John",
-                        "lastName" => "Smith",
-                        "dateOfBirth" => "01281980",
-                        "gender" => "male",
-                        "baggage" => "carryon",
-                        "seats" => "1B",
-                        "boardingPriority" => "1"
-                    ]
-                ]
             ]
         ];
         

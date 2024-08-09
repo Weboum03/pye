@@ -45,7 +45,7 @@
                 </td>
                 <td class="px-6 py-4 text-center">
                     <!-- <a href="/transactions/{{ $transaction->id }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a> -->
-                    @if($transaction->status == 'completed')
+                    @if($transaction->status == 'completed' && $transaction->type != 'refund')
                     <form method="post" action="{{ route('transactions.refund', ['id' => $transaction->id]) }}" >
                     @csrf
                     @method('patch')

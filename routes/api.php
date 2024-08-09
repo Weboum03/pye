@@ -65,5 +65,5 @@ Route::middleware('api.key')->group(function ($router) {
     $router->get('orders/{id}', [OrderController::class, 'show']);
     $router->post('orders', [OrderController::class, 'create']);
     $router->post('orders/{id}/process-payment', [OrderController::class, 'processPayment']);
-    $router->post('transactions/{id}/refund', [OrderController::class, 'refund']);
+    $router->post('transactions/refund', [OrderController::class, 'refund']);
 });

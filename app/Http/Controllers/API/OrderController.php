@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderResource;
+use App\Http\Resources\TransactionResource;
 use App\Models\ApiKey;
 use App\Models\Order;
 use App\Models\Transaction;
@@ -75,17 +77,17 @@ class OrderController extends Controller
             'type' => 'capture',
             'status' => 'completed'
         ]);
-        
+        $input['id'] = (string)$order->id;
         $response = $this->shiftRepository->createSale($input);
 
         if ($response->failed()) {
-            return $this->sendError($response->collect('result')->first()['error']['longText']);
+            return $this->sendError($response->collect('result'));
         }
 
         $order->update(['status' => 'completed']);
         $order->transaction_id = $transaction->transaction_id;
 
-        return $this->sendResponse($order, __('ApiMessage.success'));
+        return $this->sendResponse(new OrderResource($order), __('ApiMessage.success'));
     }
 
     public function show($id)
@@ -143,11 +145,23 @@ class OrderController extends Controller
 
         $order->update(['status' => 'completed']);
 
-        return $this->sendResponse($transaction, __('ApiMessage.success'));
+        return $this->sendResponse(new TransactionResource($transaction), __('ApiMessage.success'));
     }
 
-    public function refund($transactionId, Request $request)
+    public function refund(Request $request)
     {
+        $input = $request->all();
+        $rules = [
+            'transaction_id'    => 'required',
+        ];
+
+        $validator = Validator::make($input, $rules);
+    
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors());
+        }
+
+        $transactionId = $input['transaction_id'];
         $transaction = Transaction::where('transaction_id',$transactionId)->first();
 
         if(!$transaction) {
@@ -179,6 +193,6 @@ class OrderController extends Controller
         $order->status = 'refund';
         $order->save();
         
-        return $this->sendResponse($transaction, __('success'));
+        return $this->sendResponse(new TransactionResource($transaction), __('success'));
     }
 }

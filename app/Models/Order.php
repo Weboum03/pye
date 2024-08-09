@@ -22,6 +22,7 @@ class Order extends Model
         'exp_month',
         'exp_year',
         'cvc',
+        'tax',
         'total_amount',
         'status'
     ];
