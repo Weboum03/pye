@@ -12,6 +12,7 @@
                 <th class="py-3 px-6 text-center">Order ID</th>
                 <th class="py-3 px-6 text-center">Amount</th>
                 <th class="py-3 px-6 text-center">Status</th>
+                <th class="py-3 px-6 text-center">Date</th>
                 <th class="py-3 px-6 text-center">Actions</th>
             </tr>
         </thead>
@@ -30,6 +31,9 @@
                 </td>
                 <td class="px-6 py-4 text-center">
                     {{ $order->status }}
+                </td>
+                <td class="px-6 py-4 text-center">
+                    {{ $order->created_at }}
                 </td>
                 <td class="px-6 py-4 text-center">
                     <!-- <a href="/orders/{{ $order->id }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a> -->

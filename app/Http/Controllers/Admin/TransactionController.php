@@ -23,7 +23,7 @@ class TransactionController extends Controller
      */
     public function edit(Request $request): View
     {
-        $transactions = Transaction::latest()->get();
+        $transactions = Transaction::latest()->with('order.merchant')->get();
         return view('admins.transactions.index', [
             'transactions' => $transactions
         ]);
