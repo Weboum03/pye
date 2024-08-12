@@ -4,6 +4,36 @@
     </h2>
 </header>
 
+<form method="get" action="" class="mt-6 space-y-6">
+    <div class="flex flex-row rounded">
+        <div class="">
+            <x-input-label for="from" :value="__('From')" />
+            <x-text-input name="from" type="date" class="mt-1 block" :value="old('from', request()->from)" required autocomplete="from" />
+            <x-input-error class="mt-2" :messages="$errors->get('from')" />
+        </div>
+
+        <div class="px-6">
+            <x-input-label for="to" :value="__('To')" />
+            <x-text-input name="to" type="date" class="mt-1 block" :value="old('to', request()->to)" required autocomplete="to" />
+            <x-input-error class="mt-2" :messages="$errors->get('to')" />
+        </div>
+
+
+        <div class="flex items-center gap-4 mt-4">
+            <x-primary-button>{{ __('Filter') }}</x-primary-button>
+
+            @if (session('status') === 'profile-updated')
+            <p
+                x-data="{ show: true }"
+                x-show="show"
+                x-transition
+                x-init="setTimeout(() => show = false, 2000)"
+                class="text-sm text-gray-600">{{ __('Saved.') }}</p>
+            @endif
+        </div>
+    </div>
+</form>
+
 <div class="relative overflow-x-auto sm:rounded-lg mt-6 space-y-6">
     <table class="w-full text-sm text-left rtl:text-right" id="myTable" x-data="">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">

@@ -20,7 +20,12 @@ class OrderController extends Controller
 {
     public function edit(Request $request): View
     {
-        $orders = Auth::user()->orders;
+        if($request->has('from') && $request->has('to')) {
+            $orders = Auth::user()->orders()->whereBetween('created_at', [$request->from, $request->to])->get();
+        } else {
+            $orders = Auth::user()->orders;
+        }
+        
         return view('orders.index', [
             'orders' => $orders
         ]);
