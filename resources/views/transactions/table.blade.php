@@ -5,7 +5,7 @@
 </header>
 
 <div class="relative overflow-x-auto sm:rounded-lg mt-6 space-y-6">
-    <table class="w-full text-sm text-left rtl:text-right" id="myTable">
+    <table class="w-full text-sm text-left rtl:text-right" id="myTable" x-data="">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
                 <th class="py-3 px-6 text-center">ID</th>
@@ -44,24 +44,36 @@
                     {{ $transaction->created_at }}
                 </td>
                 <td class="px-6 py-4 text-center">
-                    <!-- <a href="/transactions/{{ $transaction->id }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a> -->
                     @if($transaction->status == 'completed' && $transaction->type != 'refund')
-                    <form method="post" action="{{ route('transactions.refund', ['id' => $transaction->id]) }}" >
-                    @csrf
-                    @method('patch')
-                    <x-primary-button x-data=""
-                        x-on:click.prevent="$dispatch('open-modal', 'confirm-key-reset')"
+                        <x-primary-button onClick="confirm({{ $transaction->id }})" class="confirm-delete"
                     >{{ __('Refund') }}</x-primary-button>
-                    </form>
                     @endif
                 </td>
             </tr>
             @endforeach
         </tbody>
-        
     </table>
 
-    
+    <x-modal name="confirm-key-reset" :show="$errors->userDeletion->isNotEmpty()" focusable>
+        <form x-data="{ transactionId:''}" x-on:update-value.window="($event) => { transactionId = $event.detail; }" method="post" action="{{ route('transactions.refund') }}" class="p-6">
+            @csrf
+            @method('patch')
+            <input type="hidden" name="id" x-model="transactionId" x-bind:value="transactionId">
+            <h2 class="text-lg font-medium text-gray-900">
+                {{ __('Are you sure you want to refund this transaction?') }}
+            </h2>
+
+            <div class="mt-6 flex justify-end">
+                <x-secondary-button x-on:click="$dispatch('close')">
+                    {{ __('Cancel') }}
+                </x-secondary-button>
+
+                <x-danger-button class="ms-3">
+                    {{ __('Confirm') }}
+                </x-danger-button>
+            </div>
+        </form>
+    </x-modal>
 </div>
 
 @section('styles')
@@ -85,5 +97,26 @@
     $(document).ready(function() {
         $('#myTable').DataTable();
     });
+</script>
+
+<script>
+
+const elements = document.getElementsByClassName('confirm-delete');
+
+const event = new CustomEvent('open-modal', {
+    detail: 'confirm-key-reset',
+    bubbles:true,
+    cancelable:true,
+    composed:true
+});
+
+function confirm(value) {
+    const eventSecond = new CustomEvent('update-value', {
+        detail: value,
+    });
+    this.dispatchEvent(event);
+    this.dispatchEvent(eventSecond);
+}
+
 </script>
 @endsection

@@ -51,8 +51,9 @@ class TransactionController extends Controller
         return Redirect::route('transactions')->with('status', 'profile-updated');
     }
 
-    public function refund(Request $request, $id)
+    public function refund(Request $request)
     {
+        $id = $request->id;
         $transaction = Transaction::findOrFail($id);
         
         // Initiate refund logic here (e.g., using Stripe, PayPal, etc.)

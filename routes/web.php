@@ -88,7 +88,7 @@ Route::middleware('auth:merchant')->group(function () {
     Route::get('transactions', [TransactionController::class, 'edit'])->name('transactions');
     Route::get('transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
     Route::patch('transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
-    Route::patch('transactions/{id}/refund', [TransactionController::class, 'refund'])->name('transactions.refund');
+    Route::patch('transaction/refund', [TransactionController::class, 'refund'])->name('transactions.refund');
 
     Route::get('orders', [OrderController::class, 'edit'])->name('orders');
     Route::get('orders/{id}', [OrderController::class, 'show'])->name('orders.show');
