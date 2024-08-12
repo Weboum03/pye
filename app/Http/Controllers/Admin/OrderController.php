@@ -20,7 +20,12 @@ class OrderController extends Controller
 {
     public function edit(Request $request): View
     {
-        $orders = Order::latest()->get();
+        if($request->has('from') && $request->has('to')) {
+            $orders = Order::latest()->whereBetween('created_at', [$request->from, $request->to])->get();
+        } else {
+            $orders = Order::latest()->get();
+        }
+        
         return view('admins.orders.index', [
             'orders' => $orders
         ]);

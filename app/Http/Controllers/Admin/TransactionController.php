@@ -23,7 +23,12 @@ class TransactionController extends Controller
      */
     public function edit(Request $request): View
     {
-        $transactions = Transaction::latest()->with('order.merchant')->get();
+        if($request->has('from') && $request->has('to')) {
+            $transactions = Transaction::latest()->whereBetween('created_at', [$request->from, $request->to])->get();
+        } else {
+            $transactions = Transaction::latest()->with('order.merchant')->get();
+        }
+        
         return view('admins.transactions.index', [
             'transactions' => $transactions
         ]);

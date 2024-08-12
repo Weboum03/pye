@@ -21,7 +21,12 @@ class AdminController extends Controller
      */
     public function edit(Request $request): View
     {
-        $admins = Admin::latest()->get();
+        if($request->has('from') && $request->has('to')) {
+            $admins = Admin::latest()->whereBetween('created_at', [$request->from, $request->to])->get();
+        } else {
+            $admins = Admin::latest()->get();
+        }
+        
         return view('admins.admins.content', [
             'admins' => $admins
         ]);

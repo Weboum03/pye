@@ -21,7 +21,12 @@ class UserController extends Controller
      */
     public function edit(Request $request): View
     {
-        $users = User::latest()->get();
+        if($request->has('from') && $request->has('to')) {
+            $users = User::latest()->whereBetween('created_at', [$request->from, $request->to])->get();
+        } else {
+            $users = User::latest()->get();
+        }
+        
         return view('admins.users.content', [
             'user' => $request->user('admin'),
             'users' => $users

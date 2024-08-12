@@ -25,7 +25,12 @@ class TransactionController extends Controller
      */
     public function edit(Request $request): View
     {
-        $transactions = Auth::user()->transactions;
+        if($request->has('from') && $request->has('to')) {
+            $transactions = Auth::user()->transactions()->whereBetween('created_at', [$request->from, $request->to])->get();
+        } else {
+            $transactions = Auth::user()->transactions;
+        }
+        
         return view('transactions.index', [
             'transactions' => $transactions
         ]);

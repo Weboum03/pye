@@ -22,7 +22,11 @@ class MerchantController extends Controller
      */
     public function edit(Request $request): View
     {
-        $users = Merchant::latest()->get();
+        if($request->has('from') && $request->has('to')) {
+            $users = Merchant::latest()->whereBetween('created_at', [$request->from, $request->to])->get();
+        } else {
+            $users = Merchant::latest()->get();
+        }
         return view('admins.merchants.content', [
             'user' => $request->user(),
             'users' => $users
