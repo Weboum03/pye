@@ -28,9 +28,36 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
+    public function login(Request $request)
     {
-        $credentials = request(['email', 'password']);
+        $input = $request->all();
+        $rules = [
+            'token_id'    => 'required|string',
+        ];
+
+        $validator = Validator::make($input, $rules);
+    
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors());
+        }
+
+        if(!base64_decode($input['token_id'], true)) {
+            return $this->sendError('Invalid token_id');
+        } else {
+            $loginDetail = json_decode(base64_decode($input['token_id'], true), true);
+            $rules = [
+                'email'    => 'required',
+                'password'    => 'required',
+            ];
+
+            $validator = Validator::make($loginDetail, $rules);
+        
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $validator->errors());
+            }
+            $credentials = $loginDetail;
+        }
+        
 
         if (! $token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Incorrect Credential'], 401);

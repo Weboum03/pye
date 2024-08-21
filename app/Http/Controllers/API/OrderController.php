@@ -32,9 +32,7 @@ class OrderController extends Controller
             'order_id'    => 'required|unique:orders',
             'tax'    => 'required',
             'amount'    => 'required',
-            'number'    => 'required',
-            'exp_month'    => 'required',
-            'cvc'    => 'required',
+            'card'    => 'required|string',
             'address'    => 'required',
             'first_name'    => 'required',
             'last_name'    => 'required',
@@ -51,6 +49,26 @@ class OrderController extends Controller
 
         if(!$merchantId) {
             return $this->sendError('Invalid API Key');
+        }
+
+        if(!base64_decode($input['card'], true)) {
+            return $this->sendError('Invalid card encryption');
+        } else {
+            $cardDetail = json_decode(base64_decode($input['card'], true), true);
+            $rules = [
+                'number'    => 'required',
+                'exp_month'    => 'required',
+                'exp_year'    => 'required|string',
+                'cvc'    => 'required',
+            ];
+
+            $validator = Validator::make($cardDetail, $rules);
+        
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $validator->errors());
+            }
+
+            $input = [...$input,...$cardDetail];
         }
 
         $order = Order::create([
