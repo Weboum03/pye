@@ -23,7 +23,7 @@
             @endif
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-xl">
-                    @include('users.partials.create')
+                    @include('admins.admins.partials.create')
                 </div>
             </div>
         </div>
