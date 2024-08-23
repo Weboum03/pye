@@ -46,7 +46,7 @@ class AuthController extends Controller
         } else {
             $loginDetail = json_decode(base64_decode($input['token_id'], true), true);
             $rules = [
-                'email'    => 'required',
+                'phone'    => 'required',
                 'password'    => 'required',
             ];
 
