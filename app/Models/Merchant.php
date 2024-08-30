@@ -56,6 +56,16 @@ class Merchant extends Authenticatable implements JWTSubject
         return $this->hasManyThrough(Transaction::class, Order::class)->latest();
     }
 
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class)->latest();
+    }
+
+    public function ticketReply()
+    {
+        return $this->hasManyThrough(TicketReply::class, Ticket::class)->latest();
+    }
+
         /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *

@@ -6,6 +6,7 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\ShiftController;
+use App\Http\Controllers\API\TicketController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -55,15 +56,19 @@ Route::group([
     $router->post('gateway/sale', [ShiftController::class, 'sale']);
     $router->post('gateway/tokenAdd', [ShiftController::class, 'tokenAdd']);
     $router->get('gateway/void', [ShiftController::class, 'void']);
-});
 
-Route::middleware('api.key')->group(function ($router) {
-    Route::get('/protected-route', function () {
-        return response()->json(['message' => 'This is a protected route']);
+    Route::middleware('api.key')->group(function ($router) {
+        Route::get('/protected-route', function () {
+            return response()->json(['message' => 'This is a protected route']);
+        });
+    
+        $router->get('orders/{id}', [OrderController::class, 'show']);
+        $router->post('orders', [OrderController::class, 'create']);
+        $router->post('orders/{id}/process-payment', [OrderController::class, 'processPayment']);
+        $router->post('transactions/refund', [OrderController::class, 'refund']);
+    
+        $router->post('tickets', [TicketController::class, 'store']);
+        $router->post('tickets/{ticket}/reply', [TicketController::class, 'reply']);
     });
-
-    $router->get('orders/{id}', [OrderController::class, 'show']);
-    $router->post('orders', [OrderController::class, 'create']);
-    $router->post('orders/{id}/process-payment', [OrderController::class, 'processPayment']);
-    $router->post('transactions/refund', [OrderController::class, 'refund']);
 });
+

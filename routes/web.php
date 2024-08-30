@@ -18,6 +18,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\IpWhitelistController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TransactionController;
 
 /*
@@ -89,6 +90,10 @@ Route::middleware('auth:merchant')->group(function () {
     Route::get('transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
     Route::patch('transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
     Route::patch('transaction/refund', [TransactionController::class, 'refund'])->name('transactions.refund');
+
+    Route::get('tickets', [TicketController::class, 'edit'])->name('tickets');
+    Route::get('tickets/{id}', [TicketController::class, 'show'])->name('tickets.show');
+    Route::patch('tickets/{id}', [TicketController::class, 'update'])->name('tickets.update');
 
     Route::get('orders', [OrderController::class, 'edit'])->name('orders');
     Route::get('orders/{id}', [OrderController::class, 'show'])->name('orders.show');
