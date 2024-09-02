@@ -38,7 +38,7 @@
                             @if($ticket->replies->count())
                             @foreach($ticket->replies as $reply)
                             <div class="mb-4">
-                                <p class="text-sm text-gray-500"><strong>{{ $reply->user?->name }}</strong> on {{ $reply->created_at->format('d M Y, H:i') }}</p>
+                                <p class="text-sm text-gray-500"><strong>{{ $reply->user?->name??'Admin' }}</strong> on {{ $reply->created_at->format('d M Y, H:i') }}</p>
                                 <p class="text-gray-700">{{ $reply->message }}</p>
                             </div>
                             <hr class="my-4 border-t border-gray-200">

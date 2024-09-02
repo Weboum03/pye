@@ -50,6 +50,12 @@ class AuthController extends Controller
                 'password'    => 'required',
             ];
 
+            $checkNumber = $this->sanitizePhoneNumber($loginDetail['phone']);
+            if ($checkNumber['text'] == 'Invalid') {
+                return $this->sendError(__('ApiMessage.invalidPhone'), '', 422);
+            }
+            $loginDetail['phone'] = $checkNumber['phoneNumber'];
+
             $validator = Validator::make($loginDetail, $rules);
         
             if ($validator->fails()) {
