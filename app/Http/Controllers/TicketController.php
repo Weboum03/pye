@@ -6,6 +6,7 @@ use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Admin;
 use App\Models\Merchant;
 use App\Models\Ticket;
+use App\Models\TicketReply;
 use App\Models\Transaction;
 use App\Providers\RouteServiceProvider;
 use Carbon\Carbon;
@@ -41,6 +42,35 @@ class TicketController extends Controller
     {
         $ticket = Auth::user()->tickets()->where('id', $id)->first();
         return view('tickets.update', [
+            'ticket' => $ticket
+        ]);
+    }
+
+    public function reply($id, Request $request): View
+    {
+        $ticket = Ticket::find($id);
+
+        if($request->method() === 'POST') {
+            // Validate the reply data
+            $request->validate([
+                'message' => 'required|string',
+            ]);
+
+            // Create the reply
+            TicketReply::create([
+                'ticket_id' => $ticket->id,
+                'message' => $request->message,
+            ]);
+
+            // Optionally update the ticket status
+            $ticket->update(['status' => 'in-progress']);
+        }
+        // /if($request->method())
+        
+        // Load the replies with the ticket
+        $ticket->load('replies.user'); // Eager load replies and the users who made the replies
+        
+        return view('tickets.reply', [
             'ticket' => $ticket
         ]);
     }

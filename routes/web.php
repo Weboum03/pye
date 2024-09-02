@@ -94,6 +94,7 @@ Route::middleware('auth:merchant')->group(function () {
     Route::get('tickets', [TicketController::class, 'edit'])->name('tickets');
     Route::get('tickets/{id}', [TicketController::class, 'show'])->name('tickets.show');
     Route::patch('tickets/{id}', [TicketController::class, 'update'])->name('tickets.update');
+    Route::any('tickets/{id}/reply', [TicketController::class, 'reply'])->name('tickets.reply');
 
     Route::get('orders', [OrderController::class, 'edit'])->name('orders');
     Route::get('orders/{id}', [OrderController::class, 'show'])->name('orders.show');

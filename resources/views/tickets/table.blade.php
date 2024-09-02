@@ -67,34 +67,13 @@
                 </td>
                 <td class="px-6 py-4 text-center">
                     @if($ticket->status != 'close')
-                        <!-- <x-primary-button onClick="confirm({{ $ticket->id }})" class="confirm-delete">{{ __('Reply') }}</x-primary-button> -->
+                        <x-anchor-button href="tickets/{{ $ticket->id }}/reply">{{ __('Reply') }}</x-anchor-button>
                     @endif
                 </td>
             </tr>
             @endforeach
         </tbody>
     </table>
-
-    <x-modal name="confirm-key-reset" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <form x-data="{ transactionId:''}" x-on:update-value.window="($event) => { transactionId = $event.detail; }" method="post" action="{{ route('transactions.refund') }}" class="p-6">
-            @csrf
-            @method('patch')
-            <input type="hidden" name="id" x-model="transactionId" x-bind:value="transactionId">
-            <h2 class="text-lg font-medium text-gray-900">
-                {{ __('Add Reply to this ticket?') }}
-            </h2>
-
-            <div class="mt-6 flex justify-end">
-                <x-secondary-button x-on:click="$dispatch('close')">
-                    {{ __('Cancel') }}
-                </x-secondary-button>
-
-                <x-danger-button class="ms-3">
-                    {{ __('Confirm') }}
-                </x-danger-button>
-            </div>
-        </form>
-    </x-modal>
 </div>
 
 @section('styles')
