@@ -80,4 +80,17 @@ class TicketController extends Controller
 
         return $this->sendResponse($ticket, __('success'));
     }
+
+    public function getReply(Request $request, Ticket $ticket)
+    {
+        $merchantId = ApiKey::where('key', $request->header('API-Key'))->value('merchant_id');
+
+        if(!$merchantId) {
+            return $this->sendError('Invalid API Key');
+        }
+
+        $ticket->load('replies.user');
+
+        return $this->sendResponse($ticket, __('success'));
+    }
 }

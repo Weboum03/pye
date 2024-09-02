@@ -69,6 +69,7 @@ Route::group([
     
         $router->post('tickets', [TicketController::class, 'store']);
         $router->post('tickets/{ticket}/reply', [TicketController::class, 'reply']);
+        $router->get('tickets/{ticket}/reply', [TicketController::class, 'getReply']);
     });
 });
 
