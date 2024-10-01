@@ -15,9 +15,9 @@ class TicketController extends Controller
     {
         $merchantId = ApiKey::where('key', $request->header('API-Key'))->value('merchant_id');
 
-        if(!$merchantId) {
-            return $this->sendError('Invalid API Key');
-        }
+        // if(!$merchantId) {
+        //     return $this->sendError('Invalid API Key');
+        // }
         
         $input = $request->all();
         $rules = [
@@ -51,9 +51,9 @@ class TicketController extends Controller
     {
         $merchantId = ApiKey::where('key', $request->header('API-Key'))->value('merchant_id');
 
-        if(!$merchantId) {
-            return $this->sendError('Invalid API Key');
-        }
+        // if(!$merchantId) {
+        //     return $this->sendError('Invalid API Key');
+        // }
 
         $input = $request->all();
 
@@ -85,9 +85,9 @@ class TicketController extends Controller
     {
         $merchantId = ApiKey::where('key', $request->header('API-Key'))->value('merchant_id');
 
-        if(!$merchantId) {
-            return $this->sendError('Invalid API Key');
-        }
+        // if(!$merchantId) {
+        //     return $this->sendError('Invalid API Key');
+        // }
 
         $ticket->load('replies.user');
 

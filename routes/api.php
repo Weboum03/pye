@@ -4,6 +4,7 @@ use App\Http\Controllers\API\Auth\ForgotPasswordController;
 use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ClearController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\ShiftController;
 use App\Http\Controllers\API\TicketController;
@@ -28,8 +29,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('password/forgot',[ForgotPasswordController::class,'forgotPassword']);
 Route::post('password/reset',[ResetPasswordController::class,'resetPassword']);
-Route::post('generate-token', [UserController::class, 'generateToken']);
-Route::get('fetch-verification-session', [UserController::class, 'fetchVerificationSession']);
+//Route::post('generate-token', [UserController::class, 'generateToken']);
+Route::post('fetch-verification-session', [ClearController::class, 'fetchVerificationSession']);
+Route::post('generate-token', [ClearController::class, 'createToken']);
+Route::post('user-profile', [ClearController::class, 'userProfile']);
+Route::any('clear-webhook/{id}', [ClearController::class, 'callback']);
+Route::any('clearme-success/{id}', [ClearController::class, 'clearmeSuccess']);
 
 Route::group([
     'middleware' => 'api',
@@ -56,8 +61,9 @@ Route::group([
     $router->post('gateway/sale', [ShiftController::class, 'sale']);
     $router->post('gateway/tokenAdd', [ShiftController::class, 'tokenAdd']);
     $router->get('gateway/void', [ShiftController::class, 'void']);
+    $router->post('user/profile-update', [UserController::class, 'updateProfile']);
 
-    Route::middleware('api.key')->group(function ($router) {
+    // Route::middleware('api.key')->group(function ($router) {
         Route::get('/protected-route', function () {
             return response()->json(['message' => 'This is a protected route']);
         });
@@ -70,6 +76,6 @@ Route::group([
         $router->post('tickets', [TicketController::class, 'store']);
         $router->post('tickets/{ticket}/reply', [TicketController::class, 'reply']);
         $router->get('tickets/{ticket}/reply', [TicketController::class, 'getReply']);
-    });
+    // });
 });
 

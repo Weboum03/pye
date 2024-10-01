@@ -47,9 +47,9 @@ class OrderController extends Controller
 
         $merchantId = ApiKey::where('key', $request->header('API-Key'))->value('merchant_id');
 
-        if(!$merchantId) {
-            return $this->sendError('Invalid API Key');
-        }
+        // if(!$merchantId) {
+        //     return $this->sendError('Invalid API Key');
+        // }
 
         if(!base64_decode($input['card'], true)) {
             return $this->sendError('Invalid card encryption');
