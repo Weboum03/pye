@@ -8,15 +8,17 @@ use App\Models\CallRate;
 use App\Models\Customer;
 use App\Models\DidNumber;
 use App\Models\DidNumberRequest;
+use App\Models\UserCard;
 use Didww\Credentials;
 use Didww\Encrypt;
 use Didww\Item\EncryptedFile;
 use Didww\Configuration;
+
 /**
  * Class IdentityRepository
  * @package App\Repositories
  * @version July 31, 2023, 7:13 am UTC
-*/
+ */
 
 class ShiftRepository
 {
@@ -28,7 +30,8 @@ class ShiftRepository
         return CallRate::class;
     }
 
-    public function createSale($payload) {
+    public function createSale($payload)
+    {
 
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
@@ -58,9 +61,28 @@ class ShiftRepository
             "apiOptions" => [
                 "ALLOWPARTIALAUTH"
             ],
-            "card" => [
+            "customer" => [
+                "addressLine1" => $payload['address'],
+                "firstName" => $payload['first_name'],
+                "lastName" => $payload['last_name'],
+                "postalCode" => $payload['postal_code'],
+            ],
+
+        ];
+
+        if (isset($payload['card_id'])) {
+            $userCard = UserCard::where('card_id', $payload['card_id'])->first();
+            $data['card'] = [
+                "expirationDate" => (string)$userCard->exp_month.$userCard->exp_year,
+                "present" => "N",
+                "token" => [
+                    "value" => (string)$userCard->card_id
+                ]
+            ];
+        } else {
+            $data['card'] = [
                 "entryMode" => "M",
-                "expirationDate" => $payload['exp_month'].$payload['exp_year'],
+                "expirationDate" => $payload['exp_month'] . $payload['exp_year'],
                 "number" => $payload['number'],
                 "present" => "N",
                 "securityCode" => [
@@ -68,17 +90,9 @@ class ShiftRepository
                     "value" => $payload['cvc'],
                 ],
                 "type" => "VS"
-            ],
-            
-            "customer" => [
-                "addressLine1" => $payload['address'],
-                "firstName" => $payload['first_name'],
-                "lastName" => $payload['last_name'],
-                "postalCode" => $payload['postal_code'],
-            ],
-            
-        ];
-        
+            ];
+        }
+
         return Http::withHeaders([
             'Content-Type' => 'application/json',
             'InterfaceVersion' => '2.1',
@@ -88,7 +102,8 @@ class ShiftRepository
         ])->post('https://api.shift4test.com/api/rest/v1/transactions/sale', $data);
     }
 
-    public function refund($payload) {
+    public function refund($payload)
+    {
 
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
@@ -99,7 +114,7 @@ class ShiftRepository
             ],
             "card" => [
                 "entryMode" => "M",
-                "expirationDate" => $payload->exp_month.$payload->exp_year,
+                "expirationDate" => $payload->exp_month . $payload->exp_year,
                 "number" => $payload->card_number,
                 "present" => "N",
                 "type" => "VS"
@@ -118,7 +133,7 @@ class ShiftRepository
                 "notes" => "Transaction notes are added here"
             ]
         ];
-        
+
         return Http::withHeaders([
             'Content-Type' => 'application/json',
             'InterfaceVersion' => '2.1',
@@ -128,14 +143,15 @@ class ShiftRepository
         ])->post('https://api.shift4test.com/api/rest/v1/transactions/refund', $data);
     }
 
-    public function tokenAdd($data) {
+    public function tokenAdd($data)
+    {
 
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
             "dateTime" => $currentDateTime,
             "card" => [
                 "number" => (string)$data['number'],
-                "expirationDate" => (string)$data['expMonth'].$data['expYear'],
+                "expirationDate" => (string)$data['expMonth'] . $data['expYear'],
                 "securityCode" => [
                     "indicator" => "1",
                     "value" => (string)$data['cvc']
@@ -151,7 +167,7 @@ class ShiftRepository
                 "postalCode" => "65144"
             ]
         ];
-        
+
         return Http::withHeaders([
             'Content-Type' => 'application/json',
             'InterfaceVersion' => '2.1',
@@ -161,14 +177,15 @@ class ShiftRepository
         ])->post('https://api.shift4test.com/api/rest/v1/tokens/add', $data);
     }
 
-    public function deleteCardToken($data) {
+    public function deleteCardToken($data)
+    {
 
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
             "dateTime" => $currentDateTime,
             "card" => [
                 "number" => (string)$data['number'],
-                "expirationDate" => (string)$data['expMonth'].$data['expYear'],
+                "expirationDate" => (string)$data['expMonth'] . $data['expYear'],
                 "securityCode" => [
                     "indicator" => "1",
                     "value" => (string)$data['cvc']
@@ -184,7 +201,7 @@ class ShiftRepository
                 "postalCode" => "65144"
             ]
         ];
-        
+
         return Http::withHeaders([
             'Content-Type' => 'application/json',
             'InterfaceVersion' => '2.1',
@@ -194,7 +211,8 @@ class ShiftRepository
         ])->post('https://api.shift4test.com/api/rest/v1/tokens/add', $data);
     }
 
-    public function accessToken() {
+    public function accessToken()
+    {
 
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
@@ -214,7 +232,8 @@ class ShiftRepository
         ])->post('https://api.shift4test.com/api/rest/v1/credentials/accesstoken', $data);
     }
 
-    public function invoice($invoiceId) {
+    public function invoice($invoiceId)
+    {
         return Http::withHeaders([
             'Invoice' => $invoiceId,
             'InterfaceVersion' => '2.1',
@@ -224,7 +243,8 @@ class ShiftRepository
         ])->get('https://api.shift4test.com/api/rest/v1/transactions/invoice');
     }
 
-    public function void() {
+    public function void()
+    {
         return Http::withHeaders([
             'Invoice' => '0000192029',
             'InterfaceVersion' => '2.1',

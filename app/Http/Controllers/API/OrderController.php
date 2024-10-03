@@ -8,6 +8,7 @@ use App\Http\Resources\TransactionResource;
 use App\Models\ApiKey;
 use App\Models\Order;
 use App\Models\Transaction;
+use App\Models\UserCard;
 use App\Repositories\ShiftRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -24,7 +25,7 @@ class OrderController extends Controller
     {
         $this->shiftRepository = $shiftRepository;
     }
-    
+
     public function create(Request $request)
     {
         $input = $request->all();
@@ -33,6 +34,7 @@ class OrderController extends Controller
             'tax'    => 'required',
             'amount'    => 'required',
             'card'    => 'required|string',
+            'card_id'    => 'required_without|card',
             'address'    => 'required',
             'first_name'    => 'required',
             'last_name'    => 'required',
@@ -40,7 +42,7 @@ class OrderController extends Controller
         ];
 
         $validator = Validator::make($input, $rules);
-    
+
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first(), $validator->errors());
         }
@@ -51,42 +53,70 @@ class OrderController extends Controller
         //     return $this->sendError('Invalid API Key');
         // }
 
-        if(!base64_decode($input['card'], true)) {
-            return $this->sendError('Invalid card encryption');
-        } else {
-            $cardDetail = json_decode(base64_decode($input['card'], true), true);
-            $rules = [
-                'number'    => 'required',
-                'exp_month'    => 'required',
-                'exp_year'    => 'required|string',
-                'cvc'    => 'required',
-            ];
+        if ($request->has('card')) {
+            if (!base64_decode($input['card'], true)) {
+                return $this->sendError('Invalid card encryption');
+            } else {
+                $cardDetail = json_decode(base64_decode($input['card'], true), true);
+                $rules = [
+                    'number'    => 'required',
+                    'exp_month'    => 'required',
+                    'exp_year'    => 'required|string',
+                    'cvc'    => 'required',
+                ];
 
-            $validator = Validator::make($cardDetail, $rules);
-        
-            if ($validator->fails()) {
-                return $this->sendError($validator->errors()->first(), $validator->errors());
+                $validator = Validator::make($cardDetail, $rules);
+
+                if ($validator->fails()) {
+                    return $this->sendError($validator->errors()->first(), $validator->errors());
+                }
+
+                $input = [...$input, ...$cardDetail];
             }
 
-            $input = [...$input,...$cardDetail];
+            $order = Order::create([
+                'order_id' => $input['order_id'],
+                'merchant_id' => $merchantId,
+                'user_id' => 1,
+                'total_amount' => $input['amount'],
+                'first_name' => $input['first_name'],
+                'last_name' => $input['last_name'],
+                'address' => $input['address'],
+                'postal_code' => $input['postal_code'],
+                'type' => 'CC',
+                'card_number' => $input['number'],
+                'exp_month' => $input['exp_month'],
+                'exp_year' => $input['exp_year'],
+                'cvc' => $input['cvc'],
+                'status' => 'pending'
+            ]);
         }
 
-        $order = Order::create([
-            'order_id' => $input['order_id'],
-            'merchant_id' => $merchantId,
-            'user_id' => 1,
-            'total_amount' => $input['amount'],
-            'first_name' => $input['first_name'],
-            'last_name' => $input['last_name'],
-            'address' => $input['address'],
-            'postal_code' => $input['postal_code'],
-            'type' => 'CC',
-            'card_number' => $input['number'],
-            'exp_month' => $input['exp_month'],
-            'exp_year' => $input['exp_year'],
-            'cvc' => $input['cvc'],
-            'status' => 'pending'
-        ]);
+        if ($request->has('card_id')) {
+            $userCard = UserCard::where('card_id', $input['card_id'])->first();
+
+            if(!$userCard) {
+                return $this->sendError('Card does not exist');
+            }
+
+            $order = Order::create([
+                'order_id' => $input['order_id'],
+                'merchant_id' => $merchantId,
+                'user_id' => 1,
+                'total_amount' => $input['amount'],
+                'first_name' => $input['first_name'],
+                'last_name' => $input['last_name'],
+                'address' => $input['address'],
+                'postal_code' => $input['postal_code'],
+                'type' => 'CC',
+                'card_number' => $userCard->number,
+                'exp_month' => $userCard->exp_month,
+                'exp_year' => $userCard->exp_year,
+                'status' => 'pending'
+            ]);
+
+        }
+        
 
         $transaction = Transaction::create([
             'transaction_id' => Str::uuid(),
@@ -110,9 +140,9 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::where('order_id',$id)->first();
+        $order = Order::where('order_id', $id)->first();
 
-        if(!$order) {
+        if (!$order) {
             return $this->sendError('Order not exist');
         }
         return $this->sendResponse($order, __('ApiMessage.success'));
@@ -132,7 +162,7 @@ class OrderController extends Controller
         ];
 
         $validator = Validator::make($input, $rules);
-    
+
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first(), $validator->errors());
         }
@@ -143,7 +173,7 @@ class OrderController extends Controller
             return $this->sendError('Order id does not exists.');
         }
 
-        if(!$order->transactions()->exists()) {
+        if (!$order->transactions()->exists()) {
             return $this->sendError('Order already captured.');
         }
 
@@ -174,15 +204,15 @@ class OrderController extends Controller
         ];
 
         $validator = Validator::make($input, $rules);
-    
+
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first(), $validator->errors());
         }
 
         $transactionId = $input['transaction_id'];
-        $transaction = Transaction::where('transaction_id',$transactionId)->first();
+        $transaction = Transaction::where('transaction_id', $transactionId)->first();
 
-        if(!$transaction) {
+        if (!$transaction) {
             return $this->sendError('Transaction not found');
         }
 
@@ -193,7 +223,7 @@ class OrderController extends Controller
             return $this->sendError($response->collect('result')->first()['error']['longText']);
         }
 
-        if($transaction->status == 'refund') {
+        if ($transaction->status == 'refund') {
             return $this->sendError('Already refunded.');
         }
 
@@ -210,7 +240,7 @@ class OrderController extends Controller
 
         $order->status = 'refund';
         $order->save();
-        
+
         return $this->sendResponse(new TransactionResource($transaction), __('success'));
     }
 }

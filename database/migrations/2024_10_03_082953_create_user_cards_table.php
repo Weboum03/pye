@@ -16,6 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');  // User relation
             $table->string('card_id');         // Tokenized card ID
             $table->string('number');            // Last 4 digits of card number
+            $table->string('exp_month');
+            $table->string('exp_year');
+            $table->string('cvc');
             $table->string('card_brand');           // Card brand (e.g., Visa, Mastercard)
             $table->timestamps();
 

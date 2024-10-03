@@ -83,6 +83,8 @@ class CardController extends Controller
             'user_id' => $request->user()->id,
             'card_id' => $responseData['card']['token']['value'],
             'number' => $responseData['card']['number'],
+            'exp_month' => substr($responseData['card']['expirationDate'], 0, 2),
+            'exp_year' => substr($responseData['card']['expirationDate'], 2, 4),
             'card_brand' => $responseData['card']['brand'],
         ]);
 

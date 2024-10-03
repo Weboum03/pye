@@ -13,6 +13,8 @@ class UserCard extends Model
         'user_id',
         'card_id',
         'number',
+        'exp_month',
+        'exp_year',
         'card_brand'
     ];
 
