@@ -33,8 +33,8 @@ class OrderController extends Controller
             'order_id'    => 'required|unique:orders',
             'tax'    => 'required',
             'amount'    => 'required',
-            'card'    => 'required|string',
-            'card_id'    => 'required_without|card',
+            'card'    => 'required_without:card_id|string',
+            'card_id'    => 'required_without:card',
             'address'    => 'required',
             'first_name'    => 'required',
             'last_name'    => 'required',
@@ -73,7 +73,7 @@ class OrderController extends Controller
 
                 $input = [...$input, ...$cardDetail];
             }
-
+            
             $order = Order::create([
                 'order_id' => $input['order_id'],
                 'merchant_id' => $merchantId,
@@ -99,6 +99,7 @@ class OrderController extends Controller
                 return $this->sendError('Card does not exist');
             }
 
+            
             $order = Order::create([
                 'order_id' => $input['order_id'],
                 'merchant_id' => $merchantId,
@@ -114,7 +115,6 @@ class OrderController extends Controller
                 'exp_year' => $userCard->exp_year,
                 'status' => 'pending'
             ]);
-
         }
         
 
