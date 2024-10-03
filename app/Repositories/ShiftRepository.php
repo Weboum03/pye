@@ -128,17 +128,17 @@ class ShiftRepository
         ])->post('https://api.shift4test.com/api/rest/v1/transactions/refund', $data);
     }
 
-    public function tokenAdd() {
+    public function tokenAdd($data) {
 
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
             "dateTime" => $currentDateTime,
             "card" => [
-                "number" => "4321000000001119",
-                "expirationDate" => 1230,
+                "number" => (string)$data['number'],
+                "expirationDate" => (string)$data['expMonth'].$data['expYear'],
                 "securityCode" => [
                     "indicator" => "1",
-                    "value" => "333"
+                    "value" => (string)$data['cvc']
                 ]
             ],
             "apiOptions" => [
@@ -146,8 +146,41 @@ class ShiftRepository
             ],
             "customer" => [
                 "addressLine1" => "65 Easy St",
-                "firstName" => "John",
-                "lastName" => "Smith",
+                "firstName" => $data['firstName'],
+                "lastName" => $data['lastName'],
+                "postalCode" => "65144"
+            ]
+        ];
+        
+        return Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'InterfaceVersion' => '2.1',
+            'InterfaceName' => 'ForwardPOS',
+            'CompanyName' => 'PAWS',
+            'AccessToken' => 'D945B773-DB7E-489F-BF18-DBDAD78F7681'
+        ])->post('https://api.shift4test.com/api/rest/v1/tokens/add', $data);
+    }
+
+    public function deleteCardToken($data) {
+
+        $currentDateTime = date('Y-m-d\TH:i:s.vP');
+        $data = [
+            "dateTime" => $currentDateTime,
+            "card" => [
+                "number" => (string)$data['number'],
+                "expirationDate" => (string)$data['expMonth'].$data['expYear'],
+                "securityCode" => [
+                    "indicator" => "1",
+                    "value" => (string)$data['cvc']
+                ]
+            ],
+            "apiOptions" => [
+                "RETURNEXPDATE"
+            ],
+            "customer" => [
+                "addressLine1" => "65 Easy St",
+                "firstName" => $data['firstName'],
+                "lastName" => $data['lastName'],
                 "postalCode" => "65144"
             ]
         ];

@@ -4,6 +4,7 @@ use App\Http\Controllers\API\Auth\ForgotPasswordController;
 use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CardController;
 use App\Http\Controllers\API\ClearController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\ShiftController;
@@ -51,6 +52,10 @@ Route::group([
     $router->apiResource('users', UserController::class);
 });
 
+$router->get('saved-cards', [CardController::class, 'getSavedCards']);
+    $router->post('store-cards', [CardController::class, 'create']);
+    $router->delete('delete-cards/{cardId}', [CardController::class, 'deleteSavedCard']);
+
 Route::group([
     'middleware' => 'auth:api'
 ], function ($router) {
@@ -62,6 +67,8 @@ Route::group([
     $router->post('gateway/tokenAdd', [ShiftController::class, 'tokenAdd']);
     $router->get('gateway/void', [ShiftController::class, 'void']);
     $router->post('user/profile-update', [UserController::class, 'updateProfile']);
+
+    
 
     // Route::middleware('api.key')->group(function ($router) {
         Route::get('/protected-route', function () {
