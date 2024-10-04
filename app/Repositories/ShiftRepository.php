@@ -22,17 +22,8 @@ use Didww\Configuration;
 
 class ShiftRepository
 {
-    /**
-     * Configure the Model
-     **/
-    public function model()
-    {
-        return CallRate::class;
-    }
-
     public function createSale($payload)
     {
-
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
             "dateTime" => $currentDateTime,
@@ -48,7 +39,6 @@ class ShiftRepository
                 "notes" => "Transaction notes are added here",
                 "purchaseCard" => [
                     "customerReference" => "D019D09309F2",
-                    "source" => "2",
                     "destinationPostalCode" => "94719",
                     "productDescriptors" => [
                         "Hamburger",
@@ -56,7 +46,8 @@ class ShiftRepository
                         "Soda",
                         "Cookie"
                     ]
-                ]
+                ],
+                "source" => "2",
             ],
             "apiOptions" => [
                 "ALLOWPARTIALAUTH"
@@ -73,8 +64,6 @@ class ShiftRepository
         if (isset($payload['card_id'])) {
             $userCard = UserCard::where('card_id', $payload['card_id'])->first();
             $data['card'] = [
-                "expirationDate" => (string)$userCard->exp_month.$userCard->exp_year,
-                "present" => "N",
                 "token" => [
                     "value" => (string)$userCard->card_id
                 ]
