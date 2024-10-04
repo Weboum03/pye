@@ -92,13 +92,12 @@ class OrderController extends Controller
             ]);
         }
 
-        if ($request->has('card_id')) {
+        elseif ($request->has('card_id')) {
             $userCard = UserCard::where('card_id', $input['card_id'])->first();
 
             if(!$userCard) {
                 return $this->sendError('Card does not exist');
             }
-
             
             $order = Order::create([
                 'order_id' => $input['order_id'],
