@@ -119,9 +119,14 @@ class CardController extends Controller
             return $this->sendError($response->collect('result'));
         }
 
+        
 
         $responseData = collect($response->json('result'))->first();
 
+        if (!isset($responseData->card)) {
+            return $this->sendError($response->collect('result'));
+        }
+        
         // Save card info to the database
         $userCard = UserCard::create([
             'user_id' => $request->user()->id,

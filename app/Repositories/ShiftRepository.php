@@ -149,9 +149,9 @@ class ShiftRepository
 
     public function tokenAdd($data, $type = 'card')
     {
-
+        
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
-        $data = [
+        $payload = [
             "dateTime" => $currentDateTime,
             "apiOptions" => [
                 "RETURNEXPDATE"
@@ -165,11 +165,11 @@ class ShiftRepository
         ];
 
         if($type == 'device') {
-            $data['device'] = [
+            $payload['device'] = [
                 'terminalId' => $data['device_token']
             ];
         } else {
-            $data['card'] = [
+            $payload['card'] = [
                 "number" => (string)$data['number'],
                 "expirationDate" => (string)$data['expMonth'] . $data['expYear'],
                 "securityCode" => [
@@ -185,7 +185,7 @@ class ShiftRepository
             'InterfaceName' => 'ForwardPOS',
             'CompanyName' => 'PAWS',
             'AccessToken' => 'D945B773-DB7E-489F-BF18-DBDAD78F7681'
-        ])->post('https://api.shift4test.com/api/rest/v1/tokens/add', $data);
+        ])->post('https://api.shift4test.com/api/rest/v1/tokens/add', $payload);
     }
 
     public function deleteCardToken($data)
