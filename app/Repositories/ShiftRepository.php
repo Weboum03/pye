@@ -30,7 +30,7 @@ class ShiftRepository
         return CallRate::class;
     }
 
-    public function createSale($payload)
+    public function createSale($payload, $type = 'card')
     {
 
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
@@ -70,7 +70,7 @@ class ShiftRepository
 
         ];
 
-        if (isset($payload['card_id'])) {
+        if ($type == 'savedCard') {
             $userCard = UserCard::where('card_id', $payload['card_id'])->first();
             $data['card'] = [
                 "token" => [
@@ -78,7 +78,7 @@ class ShiftRepository
                 ]
             ];
         } 
-        elseif(isset($payload['device_token'])) {
+        elseif($type == 'device') {
             $data['device'] = [
                 'terminalId' => $payload['device_token']
             ];
@@ -147,20 +147,12 @@ class ShiftRepository
         ])->post('https://api.shift4test.com/api/rest/v1/transactions/refund', $data);
     }
 
-    public function tokenAdd($data)
+    public function tokenAdd($data, $type = 'card')
     {
 
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
             "dateTime" => $currentDateTime,
-            "card" => [
-                "number" => (string)$data['number'],
-                "expirationDate" => (string)$data['expMonth'] . $data['expYear'],
-                "securityCode" => [
-                    "indicator" => "1",
-                    "value" => (string)$data['cvc']
-                ]
-            ],
             "apiOptions" => [
                 "RETURNEXPDATE"
             ],
@@ -171,6 +163,21 @@ class ShiftRepository
                 "postalCode" => "65144"
             ]
         ];
+
+        if($type == 'device') {
+            $data['device'] = [
+                'terminalId' => $data['device_token']
+            ];
+        } else {
+            $data['card'] = [
+                "number" => (string)$data['number'],
+                "expirationDate" => (string)$data['expMonth'] . $data['expYear'],
+                "securityCode" => [
+                    "indicator" => "1",
+                    "value" => (string)$data['cvc']
+                ] 
+            ];
+        }
 
         return Http::withHeaders([
             'Content-Type' => 'application/json',

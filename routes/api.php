@@ -52,9 +52,7 @@ Route::group([
     $router->apiResource('users', UserController::class);
 });
 
-$router->get('saved-cards', [CardController::class, 'getSavedCards']);
-    $router->post('store-cards', [CardController::class, 'create']);
-    $router->delete('delete-cards/{cardId}', [CardController::class, 'deleteSavedCard']);
+
 
 Route::group([
     'middleware' => 'auth:api'
@@ -68,7 +66,10 @@ Route::group([
     $router->get('gateway/void', [ShiftController::class, 'void']);
     $router->post('user/profile-update', [UserController::class, 'updateProfile']);
 
-    
+    $router->get('saved-cards', [CardController::class, 'getSavedCards']);
+    $router->post('store-cards', [CardController::class, 'create']);
+    $router->post('store-cards/device', [CardController::class, 'createByDevice']);
+    $router->delete('delete-cards/{cardId}', [CardController::class, 'deleteSavedCard']);
 
     // Route::middleware('api.key')->group(function ($router) {
         Route::get('/protected-route', function () {
@@ -77,6 +78,8 @@ Route::group([
     
         $router->get('orders/{id}', [OrderController::class, 'show']);
         $router->post('orders', [OrderController::class, 'create']);
+        $router->post('orders/card', [OrderController::class, 'createByCard']);
+        $router->post('orders/device', [OrderController::class, 'createByDevice']);
         $router->post('orders/{id}/process-payment', [OrderController::class, 'processPayment']);
         $router->post('transactions/refund', [OrderController::class, 'refund']);
     

@@ -91,6 +91,47 @@ class CardController extends Controller
         return $this->sendResponse($userCard, __('ApiMessage.success'));
     }
 
+    public function createByDevice(Request $request)
+    {
+
+        $input = $request->all();
+        $rules = [
+            'firstName'    => 'required',
+            'lastName'    => 'required',
+            'device_token'    => 'required|string'
+        ];
+
+        $validator = Validator::make($input, $rules);
+    
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors());
+        }
+
+        // $merchantId = ApiKey::where('key', $request->header('API-Key'))->value('merchant_id');
+
+        // if(!$merchantId) {
+        //     return $this->sendError('Invalid API Key');
+        // }
+        
+        $response = $this->shiftRepository->tokenAdd($input, 'device');
+
+        if ($response->failed()) {
+            return $this->sendError($response->collect('result'));
+        }
+
+
+        $responseData = collect($response->json('result'))->first();
+
+        // Save card info to the database
+        $userCard = UserCard::create([
+            'user_id' => $request->user()->id,
+            'card_id' => $responseData['card']['token']['value'],
+            'number' => $responseData['card']['number']
+        ]);
+
+        return $this->sendResponse($userCard, __('ApiMessage.success'));
+    }
+    
     public function getSavedCards(Request $request)
     {
         $cards = UserCard::where('user_id', $request->user()->id)->get();
