@@ -21,10 +21,10 @@ return new class extends Migration
             $table->string('address');
             $table->string('postal_code');
             $table->string('type'); // e.g., credit, debit, prepaid
-            $table->string('card_number');
-            $table->string('exp_month');
-            $table->string('exp_year');
-            $table->string('cvc');
+            $table->string('card_number')->nullable();
+            $table->string('exp_month')->nullable();
+            $table->string('exp_year')->nullable();
+            $table->string('cvc')->nullable();
             $table->decimal('total_amount', 8, 2);
             $table->string('status')->default('pending');
             $table->timestamps();
