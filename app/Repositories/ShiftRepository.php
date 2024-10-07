@@ -22,14 +22,26 @@ use Didww\Configuration;
 
 class ShiftRepository
 {
+    /**
+     * Configure the Model
+     **/
+    public function model()
+    {
+        return CallRate::class;
+    }
+
     public function createSale($payload)
     {
+
         $currentDateTime = date('Y-m-d\TH:i:s.vP');
         $data = [
             "dateTime" => $currentDateTime,
             "amount" => [
                 "tax" => $payload['tax'],
                 "total" => $payload['amount'],
+            ],
+            "apiOptions" => [
+                "ALLOWPARTIALAUTH"
             ],
             "clerk" => [
                 "numericId" => 1576
@@ -49,9 +61,6 @@ class ShiftRepository
                 ],
                 "source" => "2",
             ],
-            "apiOptions" => [
-                "ALLOWPARTIALAUTH"
-            ],
             "customer" => [
                 "addressLine1" => $payload['address'],
                 "firstName" => $payload['first_name'],
@@ -68,7 +77,13 @@ class ShiftRepository
                     "value" => (string)$userCard->card_id
                 ]
             ];
-        } else {
+        } 
+        elseif(isset($payload['device_token'])) {
+            $data['device'] = [
+                'terminalId' => $payload['device_token']
+            ];
+        }
+        else {
             $data['card'] = [
                 "entryMode" => "M",
                 "expirationDate" => $payload['exp_month'] . $payload['exp_year'],
@@ -81,7 +96,7 @@ class ShiftRepository
                 "type" => "VS"
             ];
         }
-
+        
         return Http::withHeaders([
             'Content-Type' => 'application/json',
             'InterfaceVersion' => '2.1',

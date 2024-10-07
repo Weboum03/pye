@@ -11,6 +11,7 @@ use App\Models\Transaction;
 use App\Models\UserCard;
 use App\Repositories\ShiftRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Shift4\Shift4;
@@ -33,8 +34,9 @@ class OrderController extends Controller
             'order_id'    => 'required|unique:orders',
             'tax'    => 'required',
             'amount'    => 'required',
-            'card'    => 'required_without:card_id|string',
-            'card_id'    => 'required_without:card',
+            'card'    => 'required_without_all:card_id,device_token|string',
+            'card_id'    => 'required_without_all:card,device_token',
+            'device_token'    => 'required_without_all:card,card_id',
             'address'    => 'required',
             'first_name'    => 'required',
             'last_name'    => 'required',
@@ -53,88 +55,111 @@ class OrderController extends Controller
         //     return $this->sendError('Invalid API Key');
         // }
 
-        if ($request->has('card')) {
-            if (!base64_decode($input['card'], true)) {
-                return $this->sendError('Invalid card encryption');
-            } else {
-                $cardDetail = json_decode(base64_decode($input['card'], true), true);
-                $rules = [
-                    'number'    => 'required',
-                    'exp_month'    => 'required',
-                    'exp_year'    => 'required|string',
-                    'cvc'    => 'required',
-                ];
+        DB::beginTransaction();
 
-                $validator = Validator::make($cardDetail, $rules);
 
-                if ($validator->fails()) {
-                    return $this->sendError($validator->errors()->first(), $validator->errors());
+        try {
+            if ($request->has('card')) {
+                if (!base64_decode($input['card'], true)) {
+                    return $this->sendError('Invalid card encryption');
+                } else {
+                    $cardDetail = json_decode(base64_decode($input['card'], true), true);
+                    $rules = [
+                        'number'    => 'required',
+                        'exp_month'    => 'required',
+                        'exp_year'    => 'required|string',
+                        'cvc'    => 'required',
+                    ];
+    
+                    $validator = Validator::make($cardDetail, $rules);
+    
+                    if ($validator->fails()) {
+                        return $this->sendError($validator->errors()->first(), $validator->errors());
+                    }
+    
+                    $input = [...$input, ...$cardDetail];
                 }
-
-                $input = [...$input, ...$cardDetail];
+                
+                $order = Order::create([
+                    'order_id' => $input['order_id'],
+                    'merchant_id' => $merchantId,
+                    'user_id' => 1,
+                    'total_amount' => $input['amount'],
+                    'first_name' => $input['first_name'],
+                    'last_name' => $input['last_name'],
+                    'address' => $input['address'],
+                    'postal_code' => $input['postal_code'],
+                    'type' => 'CC',
+                    'card_number' => $input['number'],
+                    'exp_month' => $input['exp_month'],
+                    'exp_year' => $input['exp_year'],
+                    'cvc' => $input['cvc'],
+                    'status' => 'pending'
+                ]);
+            }
+    
+            elseif ($request->has('card_id')) {
+                $userCard = UserCard::where('card_id', $input['card_id'])->first();
+    
+                if(!$userCard) {
+                    return $this->sendError('Card does not exist');
+                }
+                
+                $order = Order::create([
+                    'order_id' => $input['order_id'],
+                    'merchant_id' => $merchantId,
+                    'user_id' => 1,
+                    'total_amount' => $input['amount'],
+                    'first_name' => $input['first_name'],
+                    'last_name' => $input['last_name'],
+                    'address' => $input['address'],
+                    'postal_code' => $input['postal_code'],
+                    'type' => 'CC',
+                    'card_number' => $userCard->number,
+                    'exp_month' => $userCard->exp_month,
+                    'exp_year' => $userCard->exp_year,
+                    'status' => 'pending'
+                ]);
+            }
+            elseif ($request->has('device_token')) {
+                $order = Order::create([
+                    'order_id' => $input['order_id'],
+                    'merchant_id' => $merchantId,
+                    'user_id' => 1,
+                    'total_amount' => $input['amount'],
+                    'first_name' => $input['first_name'],
+                    'last_name' => $input['last_name'],
+                    'address' => $input['address'],
+                    'postal_code' => $input['postal_code'],
+                    'type' => 'CC',
+                    'status' => 'pending'
+                ]);
             }
             
-            $order = Order::create([
-                'order_id' => $input['order_id'],
-                'merchant_id' => $merchantId,
-                'user_id' => 1,
-                'total_amount' => $input['amount'],
-                'first_name' => $input['first_name'],
-                'last_name' => $input['last_name'],
-                'address' => $input['address'],
-                'postal_code' => $input['postal_code'],
-                'type' => 'CC',
-                'card_number' => $input['number'],
-                'exp_month' => $input['exp_month'],
-                'exp_year' => $input['exp_year'],
-                'cvc' => $input['cvc'],
-                'status' => 'pending'
+    
+            $transaction = Transaction::create([
+                'transaction_id' => Str::uuid(),
+                'order_id' => $order->id,
+                'amount' => $order->total_amount,
+                'type' => 'capture',
+                'status' => 'completed'
             ]);
-        }
-
-        elseif ($request->has('card_id')) {
-            $userCard = UserCard::where('card_id', $input['card_id'])->first();
-
-            if(!$userCard) {
-                return $this->sendError('Card does not exist');
+            $input['id'] = (string)$order->id;
+            $response = $this->shiftRepository->createSale($input);
+    
+            if ($response->failed()) {
+                return $this->sendError('Something went wrong.',$response->collect());
             }
-            
-            $order = Order::create([
-                'order_id' => $input['order_id'],
-                'merchant_id' => $merchantId,
-                'user_id' => 1,
-                'total_amount' => $input['amount'],
-                'first_name' => $input['first_name'],
-                'last_name' => $input['last_name'],
-                'address' => $input['address'],
-                'postal_code' => $input['postal_code'],
-                'type' => 'CC',
-                'card_number' => $userCard->number,
-                'exp_month' => $userCard->exp_month,
-                'exp_year' => $userCard->exp_year,
-                'status' => 'pending'
-            ]);
+    
+            $order->update(['status' => 'completed']);
+            $order->transaction_id = $transaction->transaction_id;
+    
+            return $this->sendResponse(new OrderResource($order), __('ApiMessage.success'));
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollback();
+            return $this->sendError($e, $e);
         }
-        
-
-        $transaction = Transaction::create([
-            'transaction_id' => Str::uuid(),
-            'order_id' => $order->id,
-            'amount' => $order->total_amount,
-            'type' => 'capture',
-            'status' => 'completed'
-        ]);
-        $input['id'] = (string)$order->id;
-        $response = $this->shiftRepository->createSale($input);
-
-        if ($response->failed()) {
-            return $this->sendError($response->collect('result'));
-        }
-
-        $order->update(['status' => 'completed']);
-        $order->transaction_id = $transaction->transaction_id;
-
-        return $this->sendResponse(new OrderResource($order), __('ApiMessage.success'));
     }
 
     public function show($id)
