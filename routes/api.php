@@ -70,6 +70,7 @@ Route::group([
     $router->post('store-cards', [CardController::class, 'create']);
     $router->post('store-cards/device', [CardController::class, 'createByDevice']);
     $router->delete('delete-cards/{cardId}', [CardController::class, 'deleteSavedCard']);
+    $router->post('set-default-card/{cardId}', [CardController::class, 'setDefault']);
 
     // Route::middleware('api.key')->group(function ($router) {
         Route::get('/protected-route', function () {

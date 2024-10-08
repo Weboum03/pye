@@ -78,6 +78,11 @@ class CardController extends Controller
 
         $responseData = collect($response->json('result'))->first();
 
+        if (UserCard::where('user_id', $request->user()->id)->where('card_id', $responseData['card']['token']['value'])->exists()) {
+            return $this->sendError('Card already exists');
+        }
+
+
         // Save card info to the database
         $userCard = UserCard::create([
             'user_id' => $request->user()->id,
@@ -126,6 +131,10 @@ class CardController extends Controller
         if (!isset($responseData->card)) {
             return $this->sendError($response->collect('result'));
         }
+
+        if (UserCard::where('user_id', $request->user()->id)->where('card_id', $responseData['card']['token']['value'])->exists()) {
+            return $this->sendError('Card already exists');
+        }
         
         // Save card info to the database
         $userCard = UserCard::create([
@@ -146,9 +155,15 @@ class CardController extends Controller
 
     public function deleteSavedCard($cardId, Request $request)
     {
-        $cards = UserCard::where('user_id', $request->user()->id)->where('id', $cardId)->delete();
+        $cards = UserCard::where('user_id', $request->user()->id)->where('card_id', $cardId)->delete();
 
         return $this->sendResponse($cards, __('ApiMessage.success'));
     }
 
+    public function setDefault($cardId, Request $request) 
+    {
+        UserCard::where('user_id', $request->user()->id)->update(['default' => 0]);
+        $card = UserCard::where('user_id', $request->user()->id)->where('card_id', $cardId)->update(['default' => 1]);
+        return $this->sendResponse($card, __('ApiMessage.success'));
+    }
 }

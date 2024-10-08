@@ -14,14 +14,13 @@ return new class extends Migration
         Schema::create('user_cards', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');  // User relation
-            $table->string('card_id');         // Tokenized card ID
-            $table->string('number');            // Last 4 digits of card number
+            $table->string('card_id');
+            $table->string('number');
             $table->string('exp_month');
             $table->string('exp_year');
-            $table->string('cvc');
-            $table->string('card_brand');           // Card brand (e.g., Visa, Mastercard)
+            $table->string('card_brand');
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }

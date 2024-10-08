@@ -15,7 +15,12 @@ class UserCard extends Model
         'number',
         'exp_month',
         'exp_year',
-        'card_brand'
+        'card_brand',
+        'default',
+    ];
+
+    protected $casts = [
+        'default' => 'boolean',
     ];
 
     public function user()
