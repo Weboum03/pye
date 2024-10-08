@@ -101,8 +101,8 @@ class CardController extends Controller
 
         $input = $request->all();
         $rules = [
-            'firstName'    => 'required',
-            'lastName'    => 'required',
+            'first_name'    => 'required',
+            'last_name'    => 'required',
             'device_token'    => 'required|string'
         ];
 
