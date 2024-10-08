@@ -140,7 +140,8 @@ class CardController extends Controller
         $userCard = UserCard::create([
             'user_id' => $request->user()->id,
             'card_id' => $responseData['card']['token']['value'],
-            'number' => $responseData['card']['number']
+            'number' => $responseData['card']['number'],
+            'default' => $request->save_card ? $request->save_card : false,
         ]);
 
         return $this->sendResponse($userCard, __('ApiMessage.success'));
