@@ -158,8 +158,8 @@ class ShiftRepository
             ],
             "customer" => [
                 "addressLine1" => "65 Easy St",
-                "firstName" => $data['firstName'],
-                "lastName" => $data['lastName'],
+                "firstName" => $data['first_name'],
+                "lastName" => $data['last_name'],
                 "postalCode" => "65144"
             ]
         ];
@@ -171,7 +171,7 @@ class ShiftRepository
         } else {
             $payload['card'] = [
                 "number" => (string)$data['number'],
-                "expirationDate" => (string)$data['expMonth'] . $data['expYear'],
+                "expirationDate" => (string)$data['exp_month'] . $data['exp_year'],
                 "securityCode" => [
                     "indicator" => "1",
                     "value" => (string)$data['cvc']

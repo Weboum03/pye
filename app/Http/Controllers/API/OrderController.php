@@ -109,12 +109,34 @@ class OrderController extends Controller
     
             $order->update(['status' => 'completed']);
             $order->transaction_id = $transaction->transaction_id;
+
+            
+            #if save card is true then save card
+            if ($request->save_card) {
+                $response = $this->shiftRepository->tokenAdd($input);
+
+                
+                if ($response->successful()) {
+                    $responseData = collect($response->json('result'))->first();
+                    
+                    if (!UserCard::where('user_id', $request->user()->id)->where('card_id', $responseData['card']['token']['value'])->exists()) {
+                        UserCard::create([
+                            'user_id' => $request->user()->id,
+                            'card_id' => $responseData['card']['token']['value'],
+                            'number' => $responseData['card']['number'],
+                            'exp_month' => substr($responseData['card']['expirationDate'], 0, 2),
+                            'exp_year' => substr($responseData['card']['expirationDate'], 2, 4),
+                            'card_brand' => $responseData['card']['brand'],
+                        ]);
+                    }
+                }
+            }
     
             return $this->sendResponse(new OrderResource($order), __('ApiMessage.success'));
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollback();
-            return $this->sendError($e, $e);
+            return $this->sendError($e->getMessage(), $e);
         }
     }
 

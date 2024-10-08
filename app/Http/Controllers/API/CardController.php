@@ -31,8 +31,8 @@ class CardController extends Controller
 
         $input = $request->all();
         $rules = [
-            'firstName'    => 'required',
-            'lastName'    => 'required',
+            'first_name'    => 'required',
+            'last_name'    => 'required',
             'card'    => 'required|string'
         ];
 
@@ -50,8 +50,8 @@ class CardController extends Controller
         $cardDetail = json_decode(base64_decode($input['card'], true), true);
         $rules = [
             'number'    => 'required',
-            'expMonth'    => 'required',
-            'expYear'    => 'required',
+            'exp_month'    => 'required',
+            'exp_year'    => 'required',
             'cvc'    => 'required|string',
         ];
 
