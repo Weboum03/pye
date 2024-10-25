@@ -102,8 +102,8 @@ class ShiftRepository
             'InterfaceVersion' => '2.1',
             'InterfaceName' => 'ForwardPOS',
             'CompanyName' => 'PAWS',
-            'AccessToken' => 'D945B773-DB7E-489F-BF18-DBDAD78F7681'
-        ])->post('https://api.shift4test.com/api/rest/v1/transactions/sale', $data);
+            'AccessToken' => env('SHIFT4_ACCESS_TOKEN')
+        ])->post(env('SHIFT4_API_URL').'/transactions/sale', $data);
     }
 
     public function refund($payload)
@@ -143,8 +143,8 @@ class ShiftRepository
             'InterfaceVersion' => '2.1',
             'InterfaceName' => 'ForwardPOS',
             'CompanyName' => 'PAWS',
-            'AccessToken' => 'D945B773-DB7E-489F-BF18-DBDAD78F7681'
-        ])->post('https://api.shift4test.com/api/rest/v1/transactions/refund', $data);
+            'AccessToken' => env('SHIFT4_ACCESS_TOKEN')
+        ])->post(env('SHIFT4_API_URL').'/transactions/refund', $data);
     }
 
     public function tokenAdd($data, $type = 'card')
@@ -184,8 +184,8 @@ class ShiftRepository
             'InterfaceVersion' => '2.1',
             'InterfaceName' => 'ForwardPOS',
             'CompanyName' => 'PAWS',
-            'AccessToken' => 'D945B773-DB7E-489F-BF18-DBDAD78F7681'
-        ])->post('https://api.shift4test.com/api/rest/v1/tokens/add', $payload);
+            'AccessToken' => env('SHIFT4_ACCESS_TOKEN')
+        ])->post(env('SHIFT4_API_URL').'/tokens/add', $payload);
     }
 
     public function deleteCardToken($data)
@@ -218,8 +218,8 @@ class ShiftRepository
             'InterfaceVersion' => '2.1',
             'InterfaceName' => 'ForwardPOS',
             'CompanyName' => 'PAWS',
-            'AccessToken' => 'D945B773-DB7E-489F-BF18-DBDAD78F7681'
-        ])->post('https://api.shift4test.com/api/rest/v1/tokens/add', $data);
+            'AccessToken' => env('SHIFT4_ACCESS_TOKEN')
+        ])->post(env('SHIFT4_API_URL').'/tokens/add', $data);
     }
 
     public function accessToken()
@@ -240,7 +240,7 @@ class ShiftRepository
             'InterfaceVersion' => '2.1',
             'InterfaceName' => 'ForwardPOS',
             'CompanyName' => 'PAWS'
-        ])->post('https://api.shift4test.com/api/rest/v1/credentials/accesstoken', $data);
+        ])->post(env('SHIFT4_API_URL').'/credentials/accesstoken', $data);
     }
 
     public function invoice($invoiceId)
@@ -250,8 +250,8 @@ class ShiftRepository
             'InterfaceVersion' => '2.1',
             'InterfaceName' => 'ForwardPOS',
             'CompanyName' => 'PAWS',
-            'AccessToken' => 'D945B773-DB7E-489F-BF18-DBDAD78F7681'
-        ])->get('https://api.shift4test.com/api/rest/v1/transactions/invoice');
+            'AccessToken' => env('SHIFT4_ACCESS_TOKEN')
+        ])->get(env('SHIFT4_API_URL').'/transactions/invoice');
     }
 
     public function void()
@@ -261,37 +261,7 @@ class ShiftRepository
             'InterfaceVersion' => '2.1',
             'InterfaceName' => 'ForwardPOS',
             'CompanyName' => 'PAWS',
-            'AccessToken' => 'D945B773-DB7E-489F-BF18-DBDAD78F7681'
-        ])->get('https://api.shift4test.com/api/rest/v1/transactions/invoice');
-    }
-
-    public function callGetRequest($url)
-    {
-        return Http::withHeaders([
-            'Api-Key' => env('DID_API_KEY', config('env.DID_API_KEY', 'DID_API_KEY'))
-        ])->get(env('DID_URL', 'https://api.shift4test.com/api/rest/v1/') . $url);
-    }
-
-    public function callPostRequest($url, $data)
-    {
-        return Http::withHeaders([
-            'Api-Key' => env('DID_API_KEY', config('env.DID_API_KEY', 'DID_API_KEY')),
-            'Content-Type' => 'application/vnd.api+json'
-        ])->post(env('DID_URL', 'https://api.shift4test.com/api/rest/v1/') . $url, $data);
-    }
-
-    public function callDeleteRequest($url)
-    {
-        return Http::withHeaders([
-            'Api-Key' => env('DID_API_KEY', config('env.DID_API_KEY', 'DID_API_KEY'))
-        ])->delete(env('DID_URL', 'https://api.shift4test.com/api/rest/v1/') . $url);
-    }
-
-    public function callPatchRequest($url, $data)
-    {
-        return Http::withHeaders([
-            'Api-Key' => env('DID_API_KEY', config('env.DID_API_KEY', 'DID_API_KEY')),
-            'Content-Type' => 'application/vnd.api+json'
-        ])->patch(env('DID_URL', 'https://api.shift4test.com/api/rest/v1/') . $url, $data);
+            'AccessToken' => env('SHIFT4_ACCESS_TOKEN')
+        ])->get(env('SHIFT4_API_URL').'/transactions/invoice');
     }
 }

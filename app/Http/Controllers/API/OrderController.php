@@ -11,6 +11,7 @@ use App\Models\Transaction;
 use App\Models\UserCard;
 use App\Repositories\ShiftRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
@@ -28,6 +29,119 @@ class OrderController extends Controller
     }
 
     public function create(Request $request)
+    {
+        $input = $request->all();
+        $rules = [
+            'order_id'    => 'required|unique:orders',
+            'tax'    => 'required',
+            'amount'    => 'required',
+            'card'    => 'required|string',
+            'address'    => 'required',
+            'first_name'    => 'required',
+            'last_name'    => 'required',
+            'postal_code'    => 'required',
+        ];
+
+        $validator = Validator::make($input, $rules);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), $validator->errors());
+        }
+
+        $merchantId = ApiKey::where('key', $request->header('API-Key'))->value('merchant_id');
+
+        // if(!$merchantId) {
+        //     return $this->sendError('Invalid API Key');
+        // }
+
+        DB::beginTransaction();
+
+        try {
+            if (!base64_decode($input['card'], true)) {
+                return $this->sendError('Invalid card encryption');
+            } else {
+                $cardDetail = json_decode(base64_decode($input['card'], true), true);
+                $rules = [
+                    'number'    => 'required',
+                    'exp_month'    => 'required',
+                    'exp_year'    => 'required|string',
+                    'cvc'    => 'required',
+                ];
+
+                $validator = Validator::make($cardDetail, $rules);
+
+                if ($validator->fails()) {
+                    return $this->sendError($validator->errors()->first(), $validator->errors());
+                }
+
+                $input = [...$input, ...$cardDetail];
+            }
+            
+            $order = Order::create([
+                'order_id' => $input['order_id'],
+                'merchant_id' => $merchantId,
+                'user_id' => Auth::id(),
+                'total_amount' => $input['amount'],
+                'first_name' => $input['first_name'],
+                'last_name' => $input['last_name'],
+                'address' => $input['address'],
+                'postal_code' => $input['postal_code'],
+                'type' => 'CC',
+                'card_number' => $input['number'],
+                'exp_month' => $input['exp_month'],
+                'exp_year' => $input['exp_year'],
+                'cvc' => $input['cvc'],
+                'status' => 'pending'
+            ]);
+    
+            $transaction = Transaction::create([
+                'transaction_id' => Str::uuid(),
+                'order_id' => $order->id,
+                'amount' => $order->total_amount,
+                'type' => 'capture',
+                'status' => 'completed'
+            ]);
+            $input['id'] = (string)$order->id;
+            $response = $this->shiftRepository->createSale($input, 'card');
+    
+            if ($response->failed()) {
+                return $this->sendError('Something went wrong.',$response->collect());
+            }
+    
+            $order->update(['status' => 'completed']);
+            $order->transaction_id = $transaction->transaction_id;
+
+            
+            #if save card is true then save card
+            if ($request->save_card) {
+                $response = $this->shiftRepository->tokenAdd($input);
+
+                
+                if ($response->successful()) {
+                    $responseData = collect($response->json('result'))->first();
+                    
+                    if (!UserCard::where('user_id', $request->user()->id)->where('card_id', $responseData['card']['token']['value'])->exists()) {
+                        UserCard::create([
+                            'user_id' => $request->user()->id,
+                            'card_id' => $responseData['card']['token']['value'],
+                            'number' => $responseData['card']['number'],
+                            'exp_month' => substr($responseData['card']['expirationDate'], 0, 2),
+                            'exp_year' => substr($responseData['card']['expirationDate'], 2, 4),
+                            'card_brand' => $responseData['card']['brand'],
+                        ]);
+                    }
+                }
+            }
+    
+            return $this->sendResponse(new OrderResource($order), __('ApiMessage.success'));
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollback();
+            return $this->sendError($e->getMessage(), $e);
+        }
+    }
+
+    public function createGuest(Request $request)
     {
         $input = $request->all();
         $rules = [

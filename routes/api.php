@@ -36,6 +36,7 @@ Route::post('generate-token', [ClearController::class, 'createToken']);
 Route::post('user-profile', [ClearController::class, 'userProfile']);
 Route::any('clear-webhook/{id}', [ClearController::class, 'callback']);
 Route::any('clearme-success/{id}', [ClearController::class, 'clearmeSuccess']);
+Route::post('orders/guest', [OrderController::class, 'createGuest']);
 
 Route::group([
     'middleware' => 'api',
