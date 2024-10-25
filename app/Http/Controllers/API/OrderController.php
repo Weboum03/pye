@@ -11,13 +11,9 @@ use App\Models\Transaction;
 use App\Models\UserCard;
 use App\Repositories\ShiftRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
-use Shift4\Shift4;
-use Shift4\Shift4Gateway;
-use Shift4\Exception\Shift4Exception;
 
 class OrderController extends Controller
 {
@@ -80,7 +76,7 @@ class OrderController extends Controller
             $order = Order::create([
                 'order_id' => $input['order_id'],
                 'merchant_id' => $merchantId,
-                'user_id' => Auth::id(),
+                'user_id' => $request->user()->id,
                 'total_amount' => $input['amount'],
                 'first_name' => $input['first_name'],
                 'last_name' => $input['last_name'],
@@ -223,29 +219,7 @@ class OrderController extends Controller
     
             $order->update(['status' => 'completed']);
             $order->transaction_id = $transaction->transaction_id;
-
             
-            #if save card is true then save card
-            if ($request->save_card) {
-                $response = $this->shiftRepository->tokenAdd($input);
-
-                
-                if ($response->successful()) {
-                    $responseData = collect($response->json('result'))->first();
-                    
-                    if (!UserCard::where('user_id', $request->user()->id)->where('card_id', $responseData['card']['token']['value'])->exists()) {
-                        UserCard::create([
-                            'user_id' => $request->user()->id,
-                            'card_id' => $responseData['card']['token']['value'],
-                            'number' => $responseData['card']['number'],
-                            'exp_month' => substr($responseData['card']['expirationDate'], 0, 2),
-                            'exp_year' => substr($responseData['card']['expirationDate'], 2, 4),
-                            'card_brand' => $responseData['card']['brand'],
-                        ]);
-                    }
-                }
-            }
-    
             return $this->sendResponse(new OrderResource($order), __('ApiMessage.success'));
             DB::commit();
         } catch (\Throwable $e) {
