@@ -148,6 +148,7 @@ class OrderController extends Controller
             'address'    => 'required',
             'first_name'    => 'required',
             'last_name'    => 'required',
+            'phone'    => 'required',
             'postal_code'    => 'required',
         ];
 
@@ -193,6 +194,7 @@ class OrderController extends Controller
                 'total_amount' => $input['amount'],
                 'first_name' => $input['first_name'],
                 'last_name' => $input['last_name'],
+                'phone' => $input['phone'],
                 'address' => $input['address'],
                 'postal_code' => $input['postal_code'],
                 'type' => 'CC',

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('first_name');
             $table->string('last_name');
+            $table->string('phone', 20)->nullable();
             $table->string('address');
             $table->string('postal_code');
             $table->string('type'); // e.g., credit, debit, prepaid
